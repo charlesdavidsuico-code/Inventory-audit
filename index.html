@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory Audit</title>
+<style>
+  :root{
+    --bg:#f3f5f7; --card:#ffffff; --ink:#17212b; --muted:#5d6b78; --line:#d9dfe5;
+    --brand:#0b6e75; --brand-dark:#07545a; --ok:#1c7c3c; --warn:#a15c00; --bad:#b3261e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.4;padding-bottom:76px}
+  header{background:var(--brand);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;z-index:5}
+  header h1{font-size:18px;margin:0}
+  #sync-chip{font-size:12px;background:rgba(255,255,255,.18);padding:4px 10px;border-radius:999px;white-space:nowrap}
+  main{max-width:860px;margin:0 auto;padding:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+  .card h2{font-size:16px;margin:0 0 10px}
+  .hint{color:var(--muted);font-size:14px;margin:4px 0 10px}
+  label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
+  input[type=text],input[type=number],input[type=url],input[type=search],select,textarea{
+    width:100%;padding:10px;border:1px solid #b9c2cb;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  textarea{min-height:64px;resize:vertical}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid #8fd3d8;outline-offset:1px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
+  @media (max-width:560px){.grid,.grid3{grid-template-columns:1fr}}
+  button,.btn{font:inherit;font-weight:600;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:8px;padding:10px 14px;cursor:pointer;display:inline-block;text-align:center}
+  button:hover,.btn:hover{background:var(--brand-dark)}
+  button.alt{background:#fff;color:var(--brand)}
+  button.alt:hover{background:#e8f4f5}
+  button.danger{background:#fff;color:var(--bad);border-color:var(--bad)}
+  button.small{padding:6px 10px;font-size:14px}
+  button:disabled{opacity:.5;cursor:not-allowed}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .msg{border-radius:8px;padding:10px 12px;margin-top:10px;font-size:14px}
+  .msg.err{background:#fdecea;color:var(--bad);border:1px solid #f3b9b4}
+  .msg.info{background:#e8f4f5;color:#07545a;border:1px solid #b5dade}
+  .msg.good{background:#e7f5ec;color:var(--ok);border:1px solid #b4dcc1}
+  .hidden{display:none !important}
+  #preview{max-width:100%;max-height:220px;border-radius:8px;border:1px solid var(--line);margin-top:10px;display:block}
+  .pick{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);margin-top:6px;font-weight:400}
+  .pick:hover{background:#eef7f8}
+  .pick b{display:block}
+  .pick span{color:var(--muted);font-size:13px}
+  .tag{display:inline-block;font-size:12px;border-radius:999px;padding:2px 8px;background:#e7f5ec;color:var(--ok);margin-left:6px}
+  .tag.wait{background:#fff4e0;color:var(--warn)}
+  .item{display:flex;gap:10px;border-top:1px solid var(--line);padding:10px 0}
+  .item:first-child{border-top:0}
+  .item img,.item .noimg{width:56px;height:56px;border-radius:8px;object-fit:cover;background:#e6eaee;flex:none}
+  .item .body{flex:1;min-width:0}
+  .item .name{font-weight:700;overflow-wrap:anywhere}
+  .item .meta{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+  .item .sku{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  .item .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{border:1px solid var(--line);padding:4px 6px;text-align:left;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+  .scroll{overflow-x:auto}
+  nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:6}
+  nav button{flex:1;border:0;border-radius:0;background:#fff;color:var(--muted);padding:14px 4px;font-size:14px}
+  nav button:hover{background:#eef2f5}
+  nav button.on{color:var(--brand);box-shadow:inset 0 3px 0 var(--brand)}
+  #toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#17212b;color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;z-index:9;max-width:90%;text-align:center}
+  progress{width:100%;height:10px;margin-top:8px}
+  #script-box{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;min-height:160px;white-space:pre}
+  ol{padding-left:20px;margin:6px 0}
+  #print-area{display:none}
+  @media print{
+    body{background:#fff;padding:0}
+    body > *:not(#print-area){display:none !important}
+    #print-area{display:block}
+    .label{width:2.6in;border:1px solid #000;border-radius:6px;padding:8px;margin:0 8px 8px 0;display:inline-block;vertical-align:top;page-break-inside:avoid;break-inside:avoid;color:#000}
+    .label .l-name{font-weight:700;font-size:13px;line-height:1.2;max-height:2.4em;overflow:hidden}
+    .label .l-sku{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;font-weight:700;margin-top:2px}
+    .label .l-loc{font-size:11px;margin-top:2px}
+    .label svg{max-width:100%;height:auto;display:block;margin-top:4px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Inventory Audit</h1>
+  <span id="sync-chip">Saved on this device</span>
+</header>
+
+<main>
+  <!-- ADD TAB -->
+  <section id="tab-add">
+    <div class="card">
+      <h2>1. Scan a photo</h2>
+      <p class="hint">Take a photo of the item's label, tag, or box. The app reads it and finds the item in your tracking sheet.</p>
+      <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+      <div class="row" style="margin-top:0">
+        <button type="button" id="photo-btn">Take or choose photo</button>
+        <button type="button" class="alt hidden" id="photo-clear">Remove photo</button>
+      </div>
+      <img id="preview" class="hidden" alt="Photo of the item">
+      <div id="scan-status" class="msg info hidden" role="status"></div>
+      <progress id="scan-progress" class="hidden" max="100" value="0"></progress>
+      <div id="scan-results"></div>
+
+      <label for="sheet-search">Or search the tracking sheet</label>
+      <input type="search" id="sheet-search" placeholder="Type a name, number, or location">
+      <div id="search-results"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="form-title">2. Item details</h2>
+      <form id="item-form" novalidate>
+        <label for="f-name">Item name *</label>
+        <input type="text" id="f-name" maxlength="120" autocomplete="off">
+
+        <label for="f-desc">Description</label>
+        <input type="text" id="f-desc" maxlength="200" autocomplete="off">
+
+        <div class="grid">
+          <div>
+            <label for="f-cat">Category</label>
+            <input type="text" id="f-cat" list="dl-cat" maxlength="40" autocomplete="off">
+          </div>
+          <div>
+            <label for="f-sheetid">Tracking sheet ID</label>
+            <input type="text" id="f-sheetid" maxlength="60" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div>
+            <label for="f-site">Location / site *</label>
+            <input type="text" id="f-site" list="dl-site" maxlength="60" autocomplete="off">
+          </div>
+          <div>
+            <label for="f-area">Area or aisle</label>
+            <input type="text" id="f-area" list="dl-area" maxlength="40" autocomplete="off">
+          </div>
+          <div>
+            <label for="f-bin">Shelf or bin</label>
+            <input type="text" id="f-bin" maxlength="40" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div>
+            <label for="f-qty">Quantity counted *</label>
+            <input type="number" id="f-qty" min="0" step="any" inputmode="decimal">
+          </div>
+          <div>
+            <label for="f-unit">Unit</label>
+            <input type="text" id="f-unit" list="dl-unit" maxlength="20" autocomplete="off">
+          </div>
+          <div>
+            <label for="f-cond">Condition</label>
+            <select id="f-cond">
+              <option>Good</option>
+              <option>Damaged</option>
+              <option>Needs review</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="f-notes">Notes</label>
+        <textarea id="f-notes" maxlength="500"></textarea>
+
+        <div class="grid">
+          <div>
+            <label for="f-sku">SKU *</label>
+            <input type="text" id="f-sku" maxlength="40" autocomplete="off" autocapitalize="characters">
+          </div>
+          <div>
+            <label for="f-by">Audited by</label>
+            <input type="text" id="f-by" maxlength="60" autocomplete="name">
+          </div>
+        </div>
+        <p class="hint">The SKU is made for you from the category and location. You can change it.</p>
+
+        <div id="form-error" class="msg err hidden" role="alert"></div>
+
+        <div class="row">
+          <button type="submit" id="save-btn">Save item</button>
+          <button type="button" class="alt" id="newsku-btn">Make new SKU</button>
+          <button type="button" class="alt" id="clear-btn">Clear form</button>
+        </div>
+      </form>
+      <div id="saved-box" class="msg good hidden"></div>
+    </div>
+  </section>
+
+  <!-- ITEMS TAB -->
+  <section id="tab-items" class="hidden">
+    <div class="card">
+      <h2>Recorded items</h2>
+      <div class="grid">
+        <div>
+          <label for="item-search">Search</label>
+          <input type="search" id="item-search" placeholder="Name, SKU, or location">
+        </div>
+        <div>
+          <label for="item-site">Location</label>
+          <select id="item-site"><option value="">All locations</option></select>
+        </div>
+      </div>
+      <div class="row">
+        <button type="button" id="export-btn">Download CSV</button>
+        <button type="button" class="alt" id="print-all-btn">Print labels shown</button>
+      </div>
+      <p class="hint" id="item-count"></p>
+      <div id="item-list"></div>
+      <div class="row"><button type="button" class="alt hidden" id="more-btn">Show more</button></div>
+    </div>
+  </section>
+
+  <!-- SHEET TAB -->
+  <section id="tab-sheet" class="hidden">
+    <div class="card">
+      <h2>Tracking sheet</h2>
+      <p class="hint">Load your tracking sheet once on each device. Use a CSV or Excel file. From Google Sheets: File &gt; Download &gt; CSV.</p>
+      <input type="file" id="sheet-input" accept=".csv,.tsv,.txt,.xlsx,.xls" class="hidden">
+      <div class="row" style="margin-top:0">
+        <button type="button" id="sheet-btn">Load tracking sheet</button>
+        <button type="button" class="danger hidden" id="sheet-remove">Remove sheet</button>
+      </div>
+      <div id="sheet-status" class="msg info hidden" role="status"></div>
+    </div>
+    <div class="card hidden" id="map-card">
+      <h2>Match your columns</h2>
+      <p class="hint">Tell the app which column holds each detail. It has made a first guess.</p>
+      <div class="grid" id="map-grid"></div>
+      <h2 style="margin-top:16px">First rows</h2>
+      <div class="scroll"><table id="sheet-preview"></table></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS TAB -->
+  <section id="tab-settings" class="hidden">
+    <div class="card">
+      <h2>Your details</h2>
+      <label for="s-name">Your name (goes on each record)</label>
+      <input type="text" id="s-name" maxlength="60" autocomplete="name">
+      <label for="s-device">Device code (2 letters or numbers, part of each SKU)</label>
+      <input type="text" id="s-device" maxlength="2" autocapitalize="characters" autocomplete="off">
+      <p class="hint">Each phone or computer needs its own code. This stops two people from making the same SKU.</p>
+      <div id="settings-msg" class="msg err hidden" role="alert"></div>
+      <div class="row"><button type="button" id="s-save">Save details</button></div>
+    </div>
+
+    <div class="card">
+      <h2>Send records to a Google Sheet (optional)</h2>
+      <p class="hint">Do this once so every device saves to the same online sheet. Staff do not need to log in.</p>
+      <ol>
+        <li>Open a Google Sheet. Go to Extensions &gt; Apps Script.</li>
+        <li>Delete what is there. Paste the script below. Save.</li>
+        <li>Click Deploy &gt; New deployment &gt; Web app.</li>
+        <li>Set "Execute as" to Me and "Who has access" to Anyone. Click Deploy.</li>
+        <li>Copy the web app link and paste it here.</li>
+      </ol>
+      <label for="script-box">Script to paste</label>
+      <textarea id="script-box" readonly spellcheck="false">var HEAD = ['SKU','Name','Description','Category','Site','Area','Shelf/Bin','Qty','Unit','Condition','Sheet ID','Notes','Audited by','Audited at','Updated at'];
+var KEYS = ['sku','name','description','category','site','area','bin','qty','unit','condition','sheetId','notes','auditedBy','auditedAt','updatedAt'];
+
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var d = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sh = ss.getSheetByName('Audit') || ss.insertSheet('Audit');
+    if (sh.getLastRow() === 0) sh.appendRow(HEAD);
+    var last = sh.getLastRow();
+    var skus = last > 1 ? sh.getRange(2, 1, last - 1, 1).getValues().map(function (r) { return String(r[0]); }) : [];
+    (d.records || []).forEach(function (r) {
+      var row = KEYS.map(function (k) { return r[k] == null ? '' : r[k]; });
+      var i = skus.indexOf(String(r.sku));
+      if (i >= 0) sh.getRange(i + 2, 1, 1, row.length).setValues([row]);
+      else { sh.appendRow(row); skus.push(String(r.sku)); }
+    });
+    (d.deleted || []).forEach(function (s) {
+      var i = skus.indexOf(String(s));
+      if (i >= 0) { sh.deleteRow(i + 2); skus.splice(i, 1); }
+    });
+    return out({ ok: true, saved: (d.records || []).length });
+  } catch (err) {
+    return out({ ok: false, error: String(err) });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function doGet() { return out({ ok: true }); }
+
+function out(o) {
+  return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
+}</textarea>
+      <div class="row" style="margin-top:6px"><button type="button" class="alt small" id="copy-script">Copy script</button></div>
+      <label for="s-url">Web app link</label>
+      <input type="url" id="s-url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+      <div id="sync-msg" class="msg info hidden" role="status"></div>
+      <div class="row">
+        <button type="button" id="s-url-save">Save link</button>
+        <button type="button" class="alt" id="sync-now">Send records now</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Clear this device</h2>
+      <p class="hint">This deletes all records and the tracking sheet from this device only. Download the CSV first.</p>
+      <button type="button" class="danger" id="wipe-btn">Delete everything on this device</button>
+    </div>
+  </section>
+</main>
+
+<nav aria-label="Main">
+  <button type="button" data-tab="add" class="on">Scan &amp; Add</button>
+  <button type="button" data-tab="items">Items</button>
+  <button type="button" data-tab="sheet">Sheet</button>
+  <button type="button" data-tab="settings">Settings</button>
+</nav>
+
+<datalist id="dl-cat"></datalist>
+<datalist id="dl-site"></datalist>
+<datalist id="dl-area"></datalist>
+<datalist id="dl-unit"></datalist>
+
+<div id="toast" class="hidden" role="status"></div>
+<div id="print-area"></div>
+
+<script id="logic">
+/* ---------- Pure logic (no page access) ---------- */
+var Logic = (function () {
+  var STOP = { the:1, and:1, for:1, with:1, of:1, to:1, in:1, on:1, by:1, no:1, pcs:1, each:1 };
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function parseCSV(text) {
+    text = String(text || '').replace(/^﻿/, '');
+    var firstLine = text.split(/\r?\n/, 1)[0] || '';
+    var delim = ',', best = -1;
+    [',', ';', '\t'].forEach(function (d) {
+      var n = firstLine.split(d).length;
+      if (n > best) { best = n; delim = d; }
+    });
+    var rows = [], row = [], cell = '', inQ = false, i = 0, c;
+    while (i < text.length) {
+      c = text[i];
+      if (inQ) {
+        if (c === '"') {
+          if (text[i + 1] === '"') { cell += '"'; i += 2; continue; }
+          inQ = false; i++; continue;
+        }
+        cell += c; i++; continue;
+      }
+      if (c === '"' && cell === '') { inQ = true; i++; continue; }
+      if (c === delim) { row.push(cell); cell = ''; i++; continue; }
+      if (c === '\r') { i++; continue; }
+      if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; i++; continue; }
+      cell += c; i++;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+
+  function toCSV(rows) {
+    return rows.map(function (r) {
+      return r.map(function (v) {
+        v = String(v == null ? '' : v);
+        return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+      }).join(',');
+    }).join('\r\n');
+  }
+
+  /* Turn raw rows into {headers, rows}: first non-empty row is the header. */
+  function shapeSheet(raw) {
+    var clean = (raw || []).map(function (r) {
+      return (r || []).map(function (v) { return String(v == null ? '' : v).trim(); });
+    }).filter(function (r) { return r.some(function (v) { return v !== ''; }); });
+    if (clean.length < 2) return null;
+    var width = clean.reduce(function (m, r) { return Math.max(m, r.length); }, 0);
+    var headers = [];
+    for (var i = 0; i < width; i++) headers.push(clean[0][i] || ('Column ' + (i + 1)));
+    var rows = clean.slice(1).map(function (r) {
+      var out = [];
+      for (var j = 0; j < width; j++) out.push(r[j] || '');
+      return out;
+    });
+    return { headers: headers, rows: rows };
+  }
+
+  var FIELDS = [
+    { key: 'id', label: 'Item number / ID', re: /\b(sku|upc|barcode|code|id)\b|(item|part|stock|product|material)\s*(no|#|num|number|id|code)/ },
+    { key: 'desc', label: 'Description', re: /desc|detail/ },
+    { key: 'qty', label: 'Quantity', re: /qty|quant|count|on\s*hand|stock/ },
+    { key: 'unit', label: 'Unit', re: /\bunit|uom|measure/ },
+    { key: 'category', label: 'Category', re: /categ|type|class|group|dept/ },
+    { key: 'location', label: 'Location', re: /loc|site|warehouse|\bbin\b|shelf|area|store|yard|building/ },
+    { key: 'name', label: 'Item name', re: /name|item|product|title|material/ }
+  ];
+
+  function guessMapping(headers) {
+    var map = {}, used = {};
+    FIELDS.forEach(function (f) {
+      map[f.key] = -1;
+      for (var i = 0; i < headers.length; i++) {
+        if (used[i]) continue;
+        if (f.re.test(String(headers[i]).toLowerCase())) { map[f.key] = i; used[i] = 1; break; }
+      }
+    });
+    return map;
+  }
+
+  function rowToFields(row, map) {
+    function get(k) { var i = map[k]; return (i >= 0 && row[i] != null) ? String(row[i]).trim() : ''; }
+    var name = get('name'), desc = get('desc');
+    if (!name) { name = desc; desc = ''; }
+    var q = get('qty').replace(/,/g, ''), qty = '';
+    if (q !== '' && isFinite(Number(q))) qty = String(Number(q));
+    return { sheetId: get('id'), name: name, description: desc, category: get('category'), site: get('location'), qty: qty, unit: get('unit') };
+  }
+
+  function tokens(s) {
+    return (String(s || '').toLowerCase().match(/[a-z0-9]+/g) || []).filter(function (t) { return t.length >= 2 && !STOP[t]; });
+  }
+
+  function flat(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+  function buildIndex(rows, map) {
+    return rows.map(function (r) {
+      var text = r.join(' ').toLowerCase();
+      var set = {};
+      tokens(text).forEach(function (t) { set[t] = 1; });
+      return { tokens: Object.keys(set), text: text, idFlat: map.id >= 0 ? flat(r[map.id]) : '' };
+    });
+  }
+
+  /* Score each sheet row against the text read from a photo. Returns best rows first. */
+  function matchRows(index, text, limit) {
+    var seen = {};
+    tokens(text).forEach(function (t) { seen[t] = 1; });
+    var all = flat(text), out = [];
+    for (var i = 0; i < index.length; i++) {
+      var e = index[i], score = 0;
+      for (var j = 0; j < e.tokens.length; j++) {
+        var t = e.tokens[j];
+        if (seen[t]) score += (/\d/.test(t) && t.length >= 4) ? 3 : (t.length >= 3 ? 1 : 0);
+      }
+      if (e.idFlat.length >= 4 && all.indexOf(e.idFlat) >= 0) score += 10;
+      if (score >= 2) out.push({ row: i, score: score });
+    }
+    out.sort(function (a, b) { return b.score - a.score || a.row - b.row; });
+    return out.slice(0, limit || 5);
+  }
+
+  function searchRows(index, query, limit) {
+    var words = String(query || '').toLowerCase().split(/\s+/).filter(Boolean), out = [];
+    if (!words.length) return out;
+    for (var i = 0; i < index.length && out.length < (limit || 8); i++) {
+      var ok = true;
+      for (var j = 0; j < words.length; j++) if (index[i].text.indexOf(words[j]) < 0) { ok = false; break; }
+      if (ok) out.push(i);
+    }
+    return out;
+  }
+
+  /* 3-character code. Keeps trailing numbers so "Warehouse 1" and "Warehouse 2" differ. */
+  function codeOf(s, fallback) {
+    var joined = String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (!joined) return fallback;
+    var digits = joined.replace(/[^0-9]/g, '').slice(-2);
+    var letters = joined.replace(/[0-9]/g, '');
+    var code = letters.slice(0, 3 - digits.length) + digits;
+    while (code.length < 3) code += 'X';
+    return code;
+  }
+
+  function makeSku(category, site, device, existing) {
+    var prefix = codeOf(category, 'GEN') + '-' + codeOf(site, 'LOC') + '-' + String(device || 'A1').toUpperCase() + '-';
+    var max = 0;
+    (existing || []).forEach(function (s) {
+      s = String(s || '').toUpperCase();
+      if (s.indexOf(prefix) === 0) {
+        var n = parseInt(s.slice(prefix.length), 10);
+        if (isFinite(n) && n > max) max = n;
+      }
+    });
+    var num = String(max + 1);
+    while (num.length < 4) num = '0' + num;
+    return prefix + num;
+  }
+
+  function locationText(it) {
+    return [it.site, it.area, it.bin].filter(function (v) { return v; }).join(' > ');
+  }
+
+  var EXPORT_HEAD = ['SKU', 'Name', 'Description', 'Category', 'Site', 'Area', 'Shelf/Bin', 'Qty', 'Unit', 'Condition', 'Sheet ID', 'Notes', 'Audited by', 'Audited at', 'Updated at'];
+  var EXPORT_KEYS = ['sku', 'name', 'description', 'category', 'site', 'area', 'bin', 'qty', 'unit', 'condition', 'sheetId', 'notes', 'auditedBy', 'auditedAt', 'updatedAt'];
+
+  function exportRows(items) {
+    return [EXPORT_HEAD].concat(items.map(function (it) {
+      return EXPORT_KEYS.map(function (k) { return it[k] == null ? '' : it[k]; });
+    }));
+  }
+
+  function plainRecord(it) {
+    var o = {};
+    EXPORT_KEYS.forEach(function (k) { o[k] = it[k] == null ? '' : it[k]; });
+    return o;
+  }
+
+  return { esc: esc, parseCSV: parseCSV, toCSV: toCSV, shapeSheet: shapeSheet, FIELDS: FIELDS, guessMapping: guessMapping,
+    rowToFields: rowToFields, tokens: tokens, buildIndex: buildIndex, matchRows: matchRows, searchRows: searchRows,
+    codeOf: codeOf, makeSku: makeSku, locationText: locationText, exportRows: exportRows, plainRecord: plainRecord };
+})();
+if (typeof module !== 'undefined') module.exports = Logic;
+</script>
+
+<script>
+(function () {
+  'use strict';
+  var L = Logic, esc = L.esc;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var LIBS = {
+    ocr: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
+    xlsx: 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
+    barcode: 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js'
+  };
+
+  var state = {
+    items: [], sheet: null, index: [],
+    settings: { name: '', device: '', url: '' },
+    pendingDeletes: [],
+    editingId: null, sheetRow: null, thumb: '', skuTouched: false,
+    shown: 100, lastSavedId: null, syncing: false, memoryOnly: false
+  };
+
+  /* ---------- Storage ---------- */
+  var DB = {
+    db: null,
+    open: function () {
+      return new Promise(function (res, rej) {
+        if (!window.indexedDB) return rej(new Error('no storage'));
+        var r = indexedDB.open('inventory-audit', 1);
+        r.onupgradeneeded = function () {
+          var d = r.result;
+          if (!d.objectStoreNames.contains('items')) d.createObjectStore('items', { keyPath: 'id' });
+          if (!d.objectStoreNames.contains('meta')) d.createObjectStore('meta');
+        };
+        r.onsuccess = function () { DB.db = r.result; res(); };
+        r.onerror = function () { rej(r.error); };
+      });
+    },
+    run: function (store, mode, fn) {
+      if (!DB.db) return Promise.resolve(undefined);
+      return new Promise(function (res, rej) {
+        var t = DB.db.transaction(store, mode), rq = fn(t.objectStore(store));
+        t.oncomplete = function () { res(rq ? rq.result : undefined); };
+        t.onerror = t.onabort = function () { rej(t.error || new Error('save failed')); };
+      });
+    },
+    allItems: function () { return DB.run('items', 'readonly', function (s) { return s.getAll(); }); },
+    putItem: function (it) { return DB.run('items', 'readwrite', function (s) { return s.put(it); }); },
+    putItems: function (list) { return DB.run('items', 'readwrite', function (s) { list.forEach(function (it) { s.put(it); }); }); },
+    delItem: function (id) { return DB.run('items', 'readwrite', function (s) { return s.delete(id); }); },
+    getMeta: function (k) { return DB.run('meta', 'readonly', function (s) { return s.get(k); }); },
+    setMeta: function (k, v) { return DB.run('meta', 'readwrite', function (s) { return s.put(v, k); }); },
+    wipe: function () {
+      return DB.run('items', 'readwrite', function (s) { return s.clear(); })
+        .then(function () { return DB.run('meta', 'readwrite', function (s) { return s.clear(); }); });
+    }
+  };
+
+  /* ---------- Small helpers ---------- */
+  var toastTimer;
+  function toast(text) {
+    var t = $('toast');
+    t.textContent = text; t.classList.remove('hidden');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.add('hidden'); }, 3500);
+  }
+  function show(el, text, kind) {
+    el.textContent = text;
+    if (kind) el.className = 'msg ' + kind;
+    el.classList.remove('hidden');
+  }
+  function hide(el) { el.classList.add('hidden'); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function nowText() {
+    var d = new Date(), p = function (n) { return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+  function randomDevice() {
+    var a = 'ABCDEFGHJKLMNPQRSTUVWXYZ', n = '23456789';
+    return a[Math.floor(Math.random() * a.length)] + n[Math.floor(Math.random() * n.length)];
+  }
+  var libCache = {};
+  function loadLib(name) {
+    if (!libCache[name]) {
+      libCache[name] = new Promise(function (res, rej) {
+        var s = document.createElement('script');
+        s.src = LIBS[name];
+        s.onload = function () { res(); };
+        s.onerror = function () { delete libCache[name]; rej(new Error('offline')); };
+        document.head.appendChild(s);
+      });
+    }
+    return libCache[name];
+  }
+  function allSkus(exceptId) {
+    return state.items.filter(function (it) { return it.id !== exceptId; }).map(function (it) { return it.sku; });
+  }
+  function findItem(id) {
+    for (var i = 0; i < state.items.length; i++) if (state.items[i].id === id) return state.items[i];
+    return null;
+  }
+
+  /* ---------- Tabs ---------- */
+  function openTab(name) {
+    ['add', 'items', 'sheet', 'settings'].forEach(function (t) {
+      $('tab-' + t).classList.toggle('hidden', t !== name);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-tab') === name);
+    });
+    if (name === 'items') renderItems();
+    window.scrollTo(0, 0);
+  }
+
+  /* ---------- Form ---------- */
+  var F = ['name', 'desc', 'cat', 'sheetid', 'site', 'area', 'bin', 'qty', 'unit', 'cond', 'notes', 'sku', 'by'];
+  function val(k) { return $('f-' + k).value.trim(); }
+  function setVal(k, v) { $('f-' + k).value = v == null ? '' : v; }
+
+  function refreshSku() {
+    if (state.skuTouched || state.editingId) return;
+    setVal('sku', L.makeSku(val('cat'), val('site'), state.settings.device, allSkus(null)));
+  }
+
+  function clearForm() {
+    F.forEach(function (k) { if (k !== 'cond' && k !== 'by') setVal(k, ''); });
+    $('f-cond').selectedIndex = 0;
+    setVal('by', state.settings.name);
+    state.editingId = null; state.sheetRow = null; state.thumb = ''; state.skuTouched = false;
+    $('form-title').textContent = '2. Item details';
+    $('save-btn').textContent = 'Save item';
+    hide($('form-error'));
+    clearPhoto();
+    refreshSku();
+  }
+
+  function clearPhoto() {
+    $('photo-input').value = '';
+    var p = $('preview');
+    p.removeAttribute('src'); hide(p);
+    hide($('photo-clear')); hide($('scan-status')); hide($('scan-progress'));
+    $('scan-results').innerHTML = '';
+    if (!state.editingId) state.thumb = '';
+  }
+
+  function fillFromRow(i) {
+    var f = L.rowToFields(state.sheet.rows[i], state.sheet.map);
+    state.sheetRow = i;
+    setVal('name', f.name); setVal('desc', f.description); setVal('cat', f.category);
+    setVal('sheetid', f.sheetId); setVal('site', f.site); setVal('qty', f.qty); setVal('unit', f.unit);
+    refreshSku();
+    $('scan-results').innerHTML = ''; $('search-results').innerHTML = ''; $('sheet-search').value = '';
+    show($('scan-status'), 'Filled in from the tracking sheet. Check the details, count the quantity, then save.', 'good');
+    $('f-qty').focus();
+  }
+
+  function formError(text, field) {
+    show($('form-error'), text, 'err');
+    if (field) $('f-' + field).focus();
+    return false;
+  }
+
+  function saveItem(ev) {
+    ev.preventDefault();
+    hide($('form-error')); hide($('saved-box'));
+    var sku = val('sku').toUpperCase(), qtyRaw = val('qty'), qty = Number(qtyRaw);
+    if (!val('name')) return formError('Please type the item name.', 'name');
+    if (!val('site')) return formError('Please type where the item is stored.', 'site');
+    if (qtyRaw === '' || !isFinite(qty)) return formError('Please type the quantity as a number, like 12.', 'qty');
+    if (qty < 0) return formError('The quantity cannot be less than 0.', 'qty');
+    if (!sku) return formError('Please add a SKU, or tap "Make new SKU".', 'sku');
+    if (!/^[A-Z0-9][A-Z0-9._\-]*$/.test(sku)) return formError('The SKU can use only letters, numbers, dashes, dots, and underscores.', 'sku');
+    var clash = allSkus(state.editingId).some(function (s) { return String(s).toUpperCase() === sku; });
+    if (clash) return formError('That SKU is already used by another item. Tap "Make new SKU".', 'sku');
+
+    var old = state.editingId ? findItem(state.editingId) : null, stamp = nowText();
+    var it = {
+      id: old ? old.id : uid(), sku: sku, name: val('name'), description: val('desc'), category: val('cat'),
+      site: val('site'), area: val('area'), bin: val('bin'), qty: qty, unit: val('unit'),
+      condition: $('f-cond').value, sheetId: val('sheetid'), notes: val('notes'), auditedBy: val('by'),
+      auditedAt: old ? old.auditedAt : stamp, updatedAt: stamp,
+      sheetRow: state.sheetRow, thumb: state.thumb, synced: false
+    };
+    var renamed = old && old.sku !== sku;
+    if (renamed) state.pendingDeletes.push(old.sku);
+
+    var btn = $('save-btn'); btn.disabled = true;
+    DB.putItem(it).then(function () {
+      return renamed ? DB.setMeta('pendingDeletes', state.pendingDeletes) : null;
+    }).then(function () {
+      if (old) state.items[state.items.indexOf(old)] = it; else state.items.unshift(it);
+      state.lastSavedId = it.id;
+      clearForm();
+      $('saved-box').innerHTML = 'Saved <b>' + esc(it.name) + '</b> as <b>' + esc(it.sku) + '</b>. ' +
+        '<button type="button" class="small" id="print-last">Print label</button>';
+      $('saved-box').classList.remove('hidden');
+      refreshLists(); updateChip(); renderSheetStatus();
+      toast('Item saved.');
+      syncNow(true);
+    }).catch(function () {
+      formError('The item could not be saved. This device may be out of storage space.', null);
+    }).then(function () { btn.disabled = false; });
+    return false;
+  }
+
+  function editItem(id) {
+    var it = findItem(id);
+    if (!it) return;
+    clearForm();
+    state.editingId = id; state.sheetRow = it.sheetRow == null ? null : it.sheetRow; state.thumb = it.thumb || '';
+    setVal('name', it.name); setVal('desc', it.description); setVal('cat', it.category); setVal('sheetid', it.sheetId);
+    setVal('site', it.site); setVal('area', it.area); setVal('bin', it.bin); setVal('qty', it.qty); setVal('unit', it.unit);
+    $('f-cond').value = it.condition || 'Good';
+    setVal('notes', it.notes); setVal('sku', it.sku); setVal('by', it.auditedBy);
+    $('form-title').textContent = 'Edit item ' + it.sku;
+    $('save-btn').textContent = 'Save changes';
+    if (it.thumb) { $('preview').src = it.thumb; $('preview').classList.remove('hidden'); }
+    hide($('saved-box'));
+    openTab('add');
+    $('item-form').scrollIntoView();
+  }
+
+  function deleteItem(id) {
+    var it = findItem(id);
+    if (!it) return;
+    if (!window.confirm('Delete "' + it.name + '" (' + it.sku + ')? This cannot be undone.')) return;
+    state.pendingDeletes.push(it.sku);
+    DB.delItem(id).then(function () { return DB.setMeta('pendingDeletes', state.pendingDeletes); }).then(function () {
+      state.items.splice(state.items.indexOf(it), 1);
+      if (state.editingId === id) clearForm();
+      refreshLists(); renderItems(); updateChip(); renderSheetStatus();
+      toast('Item deleted.');
+      syncNow(true);
+    }).catch(function () { toast('The item could not be deleted. Please try again.'); });
+  }
+
+  /* ---------- Lists and item view ---------- */
+  function refreshLists() {
+    function fill(id, values) {
+      var seen = {}, html = '';
+      values.forEach(function (v) {
+        v = String(v || '').trim();
+        var k = v.toLowerCase();
+        if (v && !seen[k]) { seen[k] = 1; html += '<option value="' + esc(v) + '">'; }
+      });
+      $(id).innerHTML = html;
+    }
+    var sheetVals = function (key) {
+      if (!state.sheet || state.sheet.map[key] < 0) return [];
+      var out = [], seen = {}, col = state.sheet.map[key];
+      for (var i = 0; i < state.sheet.rows.length && out.length < 200; i++) {
+        var v = state.sheet.rows[i][col];
+        if (v && !seen[v]) { seen[v] = 1; out.push(v); }
+      }
+      return out;
+    };
+    var pick = function (k) { return state.items.map(function (it) { return it[k]; }); };
+    fill('dl-cat', pick('category').concat(sheetVals('category')));
+    fill('dl-site', pick('site').concat(sheetVals('location')));
+    fill('dl-area', pick('area'));
+    fill('dl-unit', pick('unit').concat(sheetVals('unit')));
+
+    var sel = $('item-site'), cur = sel.value, seen = {}, html = '<option value="">All locations</option>';
+    pick('site').forEach(function (v) {
+      if (v && !seen[v.toLowerCase()]) { seen[v.toLowerCase()] = 1; html += '<option>' + esc(v) + '</option>'; }
+    });
+    sel.innerHTML = html; sel.value = cur;
+    if (sel.value !== cur) sel.value = '';
+  }
+
+  function filteredItems() {
+    var q = $('item-search').value.trim().toLowerCase(), site = $('item-site').value;
+    return state.items.filter(function (it) {
+      if (site && it.site !== site) return false;
+      if (!q) return true;
+      return [it.name, it.sku, it.description, it.category, it.site, it.area, it.bin, it.sheetId].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  function renderItems() {
+    var list = filteredItems(), html = '';
+    $('item-count').textContent = state.items.length === 0
+      ? 'No items recorded yet. Go to "Scan & Add" to record your first item.'
+      : 'Showing ' + Math.min(list.length, state.shown) + ' of ' + list.length + (list.length === 1 ? ' item' : ' items') +
+        (list.length !== state.items.length ? ' (' + state.items.length + ' in total)' : '') + '.';
+    list.slice(0, state.shown).forEach(function (it) {
+      html += '<div class="item">' +
+        (it.thumb ? '<img src="' + esc(it.thumb) + '" alt="">' : '<div class="noimg"></div>') +
+        '<div class="body"><div class="name">' + esc(it.name) +
+        (state.settings.url ? '<span class="tag' + (it.synced ? '">Sent' : ' wait">Not sent yet') + '</span>' : '') + '</div>' +
+        '<div class="sku">' + esc(it.sku) + '</div>' +
+        '<div class="meta">' + esc(L.locationText(it)) + ' · Qty ' + esc(it.qty) + (it.unit ? ' ' + esc(it.unit) : '') +
+        ' · ' + esc(it.condition) + '</div>' +
+        '<div class="acts">' +
+        '<button type="button" class="small alt" data-act="edit" data-id="' + esc(it.id) + '">Edit</button>' +
+        '<button type="button" class="small alt" data-act="label" data-id="' + esc(it.id) + '">Print label</button>' +
+        '<button type="button" class="small danger" data-act="del" data-id="' + esc(it.id) + '">Delete</button>' +
+        '</div></div></div>';
+    });
+    $('item-list').innerHTML = html;
+    $('more-btn').classList.toggle('hidden', list.length <= state.shown);
+  }
+
+  function exportCSV() {
+    var list = filteredItems();
+    if (!list.length) return toast('There are no items to download yet.');
+    var blob = new Blob(['﻿' + L.toCSV(L.exportRows(list))], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'inventory-audit-' + nowText().slice(0, 10) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    toast('Downloaded ' + list.length + (list.length === 1 ? ' item.' : ' items.'));
+  }
+
+  /* ---------- Labels ---------- */
+  function printLabels(list) {
+    if (!list.length) return toast('There are no labels to print.');
+    if (list.length > 300) { list = list.slice(0, 300); toast('Printing the first 300 labels. Use the filters to print the rest.'); }
+    var area = $('print-area');
+    area.innerHTML = list.map(function (it, i) {
+      return '<div class="label"><div class="l-name">' + esc(it.name) + '</div>' +
+        '<svg id="bc-' + i + '"></svg>' +
+        '<div class="l-sku">' + esc(it.sku) + '</div>' +
+        '<div class="l-loc">' + esc(L.locationText(it)) + '</div></div>';
+    }).join('');
+    loadLib('barcode').then(function () {
+      list.forEach(function (it, i) {
+        try { window.JsBarcode('#bc-' + i, it.sku, { format: 'CODE128', displayValue: false, height: 40, margin: 0, width: 1.4 }); }
+        catch (e) { var s = $('bc-' + i); if (s) s.remove(); }
+      });
+    }).catch(function () {
+      Array.prototype.forEach.call(area.querySelectorAll('svg'), function (s) { s.remove(); });
+      toast('No internet, so the labels print without a barcode.');
+    }).then(function () { window.print(); });
+  }
+
+  /* ---------- Photo scan ---------- */
+  var ocrWorker = null;
+  function loadImage(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function () { URL.revokeObjectURL(url); res(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('bad image')); };
+      img.src = url;
+    });
+  }
+  function drawScaled(img, max) {
+    var w = img.naturalWidth || img.width, h = img.naturalHeight || img.height;
+    var k = Math.min(1, max / Math.max(w, h));
+    var c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c;
+  }
+  function readBarcodes(canvas) {
+    if (!('BarcodeDetector' in window)) return Promise.resolve([]);
+    try {
+      return new window.BarcodeDetector().detect(canvas).then(function (codes) {
+        return codes.map(function (c) { return c.rawValue; }).filter(Boolean);
+      }).catch(function () { return []; });
+    } catch (e) { return Promise.resolve([]); }
+  }
+  function readText(canvas) {
+    var bar = $('scan-progress');
+    return loadLib('ocr').then(function () {
+      if (ocrWorker) return ocrWorker;
+      return window.Tesseract.createWorker('eng', 1, {
+        logger: function (m) {
+          if (m && m.status === 'recognizing text') { bar.value = Math.round((m.progress || 0) * 100); }
+        }
+      }).then(function (w) { ocrWorker = w; return w; });
+    }).then(function (w) { return w.recognize(canvas); })
+      .then(function (r) { return (r && r.data && r.data.text) || ''; });
+  }
+
+  function onPhoto() {
+    var file = $('photo-input').files[0];
+    if (!file) return;
+    var status = $('scan-status'), bar = $('scan-progress');
+    $('scan-results').innerHTML = '';
+    if (!/^image\//.test(file.type)) { show(status, 'That file is not a photo. Please choose a JPG or PNG picture.', 'err'); return; }
+    show(status, 'Reading the photo. This can take a few seconds…', 'info');
+    bar.value = 0; bar.classList.remove('hidden');
+    var canvas;
+    loadImage(file).then(function (img) {
+      canvas = drawScaled(img, 1600);
+      state.thumb = drawScaled(img, 200).toDataURL('image/jpeg', 0.6);
+      $('preview').src = state.thumb.length > 10 ? drawScaled(img, 600).toDataURL('image/jpeg', 0.7) : '';
+      $('preview').classList.remove('hidden'); $('photo-clear').classList.remove('hidden');
+      return readBarcodes(canvas);
+    }).then(function (codes) {
+      if (codes.length && showScan(codes.join(' '), true)) return null;
+      return readText(canvas).then(function (text) { showScan(codes.join(' ') + ' ' + text, false); });
+    }).catch(function (e) {
+      if (e && e.message === 'bad image') show(status, 'That photo could not be opened. Please try another one.', 'err');
+      else if (e && e.message === 'offline') show(status, 'The photo reader needs internet the first time. Connect, then try again, or search the sheet below.', 'err');
+      else show(status, 'The photo could not be read. Try a closer, brighter photo, or search the sheet below.', 'err');
+    }).then(function () { bar.classList.add('hidden'); });
+  }
+
+  /* Shows what was found. Returns true if something useful was found. */
+  function showScan(text, barcodeOnly) {
+    var status = $('scan-status'), box = $('scan-results'), html = '';
+    var upper = text.toUpperCase();
+    var known = state.items.filter(function (it) { return it.sku.length >= 5 && upper.indexOf(it.sku.toUpperCase()) >= 0; });
+    known.slice(0, 3).forEach(function (it) {
+      html += '<button type="button" class="pick" data-open="' + esc(it.id) + '"><b>Already recorded: ' + esc(it.name) + '</b>' +
+        '<span>' + esc(it.sku) + ' · ' + esc(L.locationText(it)) + ' — tap to open</span></button>';
+    });
+    var matches = state.sheet ? L.matchRows(state.index, text, 5) : [];
+    matches.forEach(function (m) { html += rowButton(m.row); });
+
+    if (!known.length && !matches.length) {
+      if (barcodeOnly) return false;
+      var lines = text.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(function (s) { return s.replace(/[^A-Za-z0-9]/g, '').length >= 3; });
+      if (!lines.length) {
+        show(status, 'No text was found in the photo. Try a closer, brighter photo of the label.', 'err');
+      } else if (!state.sheet) {
+        show(status, 'No tracking sheet is loaded yet, so the app cannot look the item up. Load it on the "Sheet" tab. You can also use the text below as the item name.', 'info');
+      } else {
+        show(status, 'No match in the tracking sheet. Search the sheet below, or use the text from the photo as the item name.', 'info');
+      }
+      lines.slice(0, 4).forEach(function (ln) {
+        html += '<button type="button" class="pick" data-name="' + esc(ln.slice(0, 120)) + '"><b>' + esc(ln.slice(0, 120)) + '</b><span>Use as item name</span></button>';
+      });
+      box.innerHTML = html;
+      return false;
+    }
+    show(status, matches.length ? 'Tap the item that matches the photo.' : 'This item is already recorded.', 'good');
+    box.innerHTML = html;
+    return true;
+  }
+
+  function rowButton(i) {
+    var f = L.rowToFields(state.sheet.rows[i], state.sheet.map);
+    var done = state.items.some(function (it) { return it.sheetRow === i; });
+    var title = f.name || state.sheet.rows[i].filter(Boolean).slice(0, 2).join(' · ') || ('Row ' + (i + 2));
+    var sub = [f.sheetId, f.category, f.site].filter(Boolean).join(' · ') || ('Sheet row ' + (i + 2));
+    return '<button type="button" class="pick" data-row="' + i + '"><b>' + esc(title) + (done ? '<span class="tag">Recorded</span>' : '') + '</b>' +
+      '<span>' + esc(sub) + '</span></button>';
+  }
+
+  function onSheetSearch() {
+    var q = $('sheet-search').value, box = $('search-results');
+    if (!q.trim()) { box.innerHTML = ''; return; }
+    if (!state.sheet) { box.innerHTML = '<div class="msg info">Load your tracking sheet on the "Sheet" tab first.</div>'; return; }
+    var hits = L.searchRows(state.index, q, 8);
+    box.innerHTML = hits.length ? hits.map(rowButton).join('') : '<div class="msg info">Nothing in the sheet matches that. Check the spelling or fill in the form by hand.</div>';
+  }
+
+  /* ---------- Tracking sheet ---------- */
+  function onSheetFile() {
+    var file = $('sheet-input').files[0];
+    if (!file) return;
+    var status = $('sheet-status'), name = file.name.toLowerCase();
+    show(status, 'Loading the sheet…', 'info');
+    var job;
+    if (/\.(xlsx|xls)$/.test(name)) {
+      job = loadLib('xlsx').then(function () { return file.arrayBuffer(); }).then(function (buf) {
+        var wb = window.XLSX.read(buf, { type: 'array' });
+        return window.XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false });
+      });
+    } else if (/\.(csv|tsv|txt)$/.test(name)) {
+      job = file.text().then(L.parseCSV);
+    } else {
+      $('sheet-input').value = '';
+      return show(status, 'Please choose a CSV or Excel file (.csv, .xlsx, or .xls).', 'err');
+    }
+    job.then(function (raw) {
+      var shaped = L.shapeSheet(raw);
+      if (!shaped) throw new Error('empty');
+      state.sheet = { headers: shaped.headers, rows: shaped.rows, map: L.guessMapping(shaped.headers), fileName: file.name };
+      state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
+      return DB.setMeta('sheet', state.sheet);
+    }).then(function () {
+      renderSheet(); refreshLists();
+      toast('Tracking sheet loaded.');
+    }).catch(function (e) {
+      if (e && e.message === 'empty') show(status, 'That file has no rows under the header row. Please check the file and try again.', 'err');
+      else if (e && e.message === 'offline') show(status, 'Excel files need internet the first time. Connect and try again, or save the sheet as CSV.', 'err');
+      else show(status, 'That file could not be read. Try saving it as CSV and loading it again.', 'err');
+    }).then(function () { $('sheet-input').value = ''; });
+  }
+
+  function renderSheetStatus() {
+    if (!state.sheet) return;
+    var done = {};
+    state.items.forEach(function (it) { if (it.sheetRow != null) done[it.sheetRow] = 1; });
+    show($('sheet-status'), state.sheet.rows.length + ' rows loaded from "' + state.sheet.fileName + '". ' +
+      Object.keys(done).length + ' of them recorded on this device so far.', 'info');
+  }
+
+  function renderSheet() {
+    var has = !!state.sheet;
+    $('map-card').classList.toggle('hidden', !has);
+    $('sheet-remove').classList.toggle('hidden', !has);
+    if (!has) { hide($('sheet-status')); return; }
+    renderSheetStatus();
+    var opts = '<option value="-1">(not in my sheet)</option>' + state.sheet.headers.map(function (h, i) {
+      return '<option value="' + i + '">' + esc(h) + '</option>';
+    }).join('');
+    $('map-grid').innerHTML = L.FIELDS.slice().sort(function (a, b) {
+      var order = ['id', 'name', 'desc', 'category', 'location', 'qty', 'unit'];
+      return order.indexOf(a.key) - order.indexOf(b.key);
+    }).map(function (f) {
+      return '<div><label for="map-' + f.key + '">' + esc(f.label) + '</label><select id="map-' + f.key + '" data-map="' + f.key + '">' + opts + '</select></div>';
+    }).join('');
+    L.FIELDS.forEach(function (f) { $('map-' + f.key).value = String(state.sheet.map[f.key]); });
+    var head = '<tr>' + state.sheet.headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr>';
+    var body = state.sheet.rows.slice(0, 5).map(function (r) {
+      return '<tr>' + r.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>';
+    }).join('');
+    $('sheet-preview').innerHTML = head + body;
+  }
+
+  function onMapChange(ev) {
+    var key = ev.target.getAttribute('data-map');
+    if (!key || !state.sheet) return;
+    state.sheet.map[key] = parseInt(ev.target.value, 10);
+    state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
+    DB.setMeta('sheet', state.sheet).catch(function () {});
+    refreshLists();
+    toast('Column saved.');
+  }
+
+  function removeSheet() {
+    if (!window.confirm('Remove the tracking sheet from this device? Your recorded items stay.')) return;
+    state.sheet = null; state.index = [];
+    DB.setMeta('sheet', null).catch(function () {});
+    renderSheet(); refreshLists();
+    $('search-results').innerHTML = '';
+    toast('Tracking sheet removed.');
+  }
+
+  /* ---------- Settings and sync ---------- */
+  function saveDetails() {
+    var name = $('s-name').value.trim(), dev = $('s-device').value.trim().toUpperCase(), box = $('settings-msg');
+    if (!/^[A-Z0-9]{2}$/.test(dev)) { show(box, 'The device code must be 2 letters or numbers, like K7.', 'err'); $('s-device').focus(); return; }
+    hide(box);
+    state.settings.name = name; state.settings.device = dev;
+    $('s-device').value = dev;
+    DB.setMeta('settings', state.settings).catch(function () {});
+    if (!val('by')) setVal('by', name);
+    refreshSku();
+    toast('Details saved.');
+  }
+
+  function saveUrl() {
+    var url = $('s-url').value.trim(), box = $('sync-msg');
+    if (url && !/^https:\/\/script\.google\.com\/macros\/s\/[^\/]+\/exec$/.test(url)) {
+      show(box, 'That link does not look right. It should start with https://script.google.com/macros/s/ and end with /exec.', 'err');
+      $('s-url').focus(); return;
+    }
+    state.settings.url = url;
+    DB.setMeta('settings', state.settings).catch(function () {});
+    updateChip();
+    if (!url) { show(box, 'Link removed. Records now stay on this device only.', 'info'); return; }
+    show(box, 'Link saved. Sending records…', 'info');
+    syncNow(false);
+  }
+
+  function updateChip() {
+    var chip = $('sync-chip');
+    if (state.memoryOnly) { chip.textContent = 'Not saving — see message'; return; }
+    if (!state.settings.url) { chip.textContent = 'Saved on this device'; return; }
+    var waiting = state.items.filter(function (it) { return !it.synced; }).length + state.pendingDeletes.length;
+    chip.textContent = state.syncing ? 'Sending…' : (waiting ? waiting + ' not sent yet' : 'All sent to Google Sheet');
+  }
+
+  function syncNow(quiet) {
+    var box = $('sync-msg');
+    if (!state.settings.url) { if (!quiet) show(box, 'Add the web app link first, then tap "Save link".', 'err'); return; }
+    if (state.syncing) return;
+    var todo = state.items.filter(function (it) { return !it.synced; }), dels = state.pendingDeletes.slice();
+    if (!todo.length && !dels.length) { if (!quiet) show(box, 'Everything is already sent.', 'good'); updateChip(); return; }
+    if (navigator.onLine === false) { if (!quiet) show(box, 'No internet right now. Records are safe on this device and will send later.', 'info'); updateChip(); return; }
+    state.syncing = true; updateChip();
+    fetch(state.settings.url, { method: 'POST', body: JSON.stringify({ records: todo.map(L.plainRecord), deleted: dels }) })
+      .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
+      .then(function (data) {
+        if (!data || !data.ok) throw new Error('script');
+        todo.forEach(function (it) { it.synced = true; });
+        state.pendingDeletes = state.pendingDeletes.filter(function (s) { return dels.indexOf(s) < 0; });
+        return DB.putItems(todo).then(function () { return DB.setMeta('pendingDeletes', state.pendingDeletes); });
+      })
+      .then(function () { if (!quiet) show(box, 'Sent ' + todo.length + (todo.length === 1 ? ' record' : ' records') + ' to the Google Sheet.', 'good'); })
+      .catch(function () {
+        if (!quiet) show(box, 'The records could not be sent. Check the link and that the script is deployed with access set to "Anyone". Records are still safe on this device.', 'err');
+      })
+      .then(function () { state.syncing = false; updateChip(); if (!$('tab-items').classList.contains('hidden')) renderItems(); });
+  }
+
+  function wipeAll() {
+    if (!window.confirm('Delete ALL records and the tracking sheet from this device? This cannot be undone.')) return;
+    DB.wipe().catch(function () {}).then(function () {
+      var keep = state.settings;
+      state.items = []; state.sheet = null; state.index = []; state.pendingDeletes = [];
+      DB.setMeta('settings', keep).catch(function () {});
+      clearForm(); hide($('saved-box')); renderSheet(); refreshLists(); renderItems(); updateChip();
+      toast('Everything on this device was deleted.');
+    });
+  }
+
+  /* ---------- Wiring ---------- */
+  function wire() {
+    Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
+      b.addEventListener('click', function () { openTab(b.getAttribute('data-tab')); });
+    });
+    $('photo-btn').addEventListener('click', function () { $('photo-input').click(); });
+    $('photo-input').addEventListener('change', onPhoto);
+    $('photo-clear').addEventListener('click', clearPhoto);
+    $('sheet-search').addEventListener('input', onSheetSearch);
+    function pickHandler(ev) {
+      var b = ev.target.closest ? ev.target.closest('.pick') : null;
+      if (!b) return;
+      if (b.hasAttribute('data-row')) fillFromRow(parseInt(b.getAttribute('data-row'), 10));
+      else if (b.hasAttribute('data-open')) editItem(b.getAttribute('data-open'));
+      else if (b.hasAttribute('data-name')) { setVal('name', b.getAttribute('data-name')); $('scan-results').innerHTML = ''; $('f-name').focus(); }
+    }
+    $('scan-results').addEventListener('click', pickHandler);
+    $('search-results').addEventListener('click', pickHandler);
+
+    $('item-form').addEventListener('submit', saveItem);
+    $('clear-btn').addEventListener('click', function () { clearForm(); hide($('saved-box')); });
+    $('newsku-btn').addEventListener('click', function () {
+      setVal('sku', L.makeSku(val('cat'), val('site'), state.settings.device, allSkus(state.editingId)));
+      state.skuTouched = false; hide($('form-error'));
+    });
+    $('f-sku').addEventListener('input', function () { state.skuTouched = $('f-sku').value.trim() !== ''; });
+    $('f-cat').addEventListener('input', refreshSku);
+    $('f-site').addEventListener('input', refreshSku);
+    $('saved-box').addEventListener('click', function (ev) {
+      if (ev.target.id === 'print-last') { var it = findItem(state.lastSavedId); if (it) printLabels([it]); }
+    });
+
+    $('item-search').addEventListener('input', function () { state.shown = 100; renderItems(); });
+    $('item-site').addEventListener('change', function () { state.shown = 100; renderItems(); });
+    $('more-btn').addEventListener('click', function () { state.shown += 100; renderItems(); });
+    $('export-btn').addEventListener('click', exportCSV);
+    $('print-all-btn').addEventListener('click', function () { printLabels(filteredItems()); });
+    $('item-list').addEventListener('click', function (ev) {
+      var act = ev.target.getAttribute('data-act'), id = ev.target.getAttribute('data-id');
+      if (act === 'edit') editItem(id);
+      else if (act === 'del') deleteItem(id);
+      else if (act === 'label') { var it = findItem(id); if (it) printLabels([it]); }
+    });
+
+    $('sheet-btn').addEventListener('click', function () { $('sheet-input').click(); });
+    $('sheet-input').addEventListener('change', onSheetFile);
+    $('sheet-remove').addEventListener('click', removeSheet);
+    $('map-grid').addEventListener('change', onMapChange);
+
+    $('s-save').addEventListener('click', saveDetails);
+    $('s-url-save').addEventListener('click', saveUrl);
+    $('sync-now').addEventListener('click', function () { syncNow(false); });
+    $('copy-script').addEventListener('click', function () {
+      var box = $('script-box');
+      var done = function () { toast('Script copied.'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(box.value).then(done).catch(function () { box.select(); toast('Select the script and copy it by hand.'); });
+      } else { box.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Select the script and copy it by hand.'); } }
+    });
+    $('wipe-btn').addEventListener('click', wipeAll);
+    window.addEventListener('online', function () { syncNow(true); });
+  }
+
+  function start() {
+    wire();
+    DB.open().then(function () {
+      return Promise.all([DB.allItems(), DB.getMeta('sheet'), DB.getMeta('settings'), DB.getMeta('pendingDeletes')]);
+    }).then(function (got) {
+      state.items = (got[0] || []).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
+      state.sheet = got[1] || null;
+      if (got[2]) state.settings = { name: got[2].name || '', device: got[2].device || '', url: got[2].url || '' };
+      state.pendingDeletes = got[3] || [];
+    }).catch(function () {
+      state.memoryOnly = true;
+      show($('form-error'), 'This browser is blocking storage, so records will be lost when you close the page. Turn off private browsing, then reload.', 'err');
+    }).then(function () {
+      if (!state.settings.device) {
+        state.settings.device = randomDevice();
+        DB.setMeta('settings', state.settings).catch(function () {});
+      }
+      if (state.sheet) state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
+      $('s-name').value = state.settings.name; $('s-device').value = state.settings.device; $('s-url').value = state.settings.url;
+      setVal('by', state.settings.name);
+      renderSheet(); refreshLists(); refreshSku(); updateChip();
+      syncNow(true);
+      window.__appReady = true;
+    });
+  }
+
+  window.__app = { state: state };
+  start();
+})();
+</script>
+</body>
+</html>
