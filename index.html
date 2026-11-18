@@ -103,22 +103,12 @@
   <!-- AUDIT TAB -->
   <section id="tab-add">
     <div class="card">
-      <h2>1. Photo and find the item</h2>
-      <p class="hint">Take a photo of the item. The app reads the label and finds it in the tracker. You can add up to 4 photos.</p>
-      <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
-      <input type="file" id="gal-input" accept="image/*" multiple class="hidden">
-      <div class="row" style="margin-top:0">
-        <button type="button" id="cam-btn">Take photo</button>
-        <button type="button" class="alt" id="gal-btn">Choose from gallery</button>
-      </div>
-      <div class="shots" id="shots"></div>
-      <div id="scan-status" class="msg info hidden" role="status"></div>
-      <progress id="scan-progress" class="hidden" max="100" value="0"></progress>
-      <div id="scan-results"></div>
-
-      <label class="f" for="sheet-search">Or search the tracker</label>
+      <h2>1. Find the item</h2>
+      <label class="f" for="sheet-search" style="margin-top:0">Search the tracker</label>
       <input type="search" id="sheet-search" placeholder="Name, part number, Tracking #, or eBay #">
       <div id="search-results"></div>
+      <div id="scan-status" class="msg info hidden" role="status"></div>
+      <p class="hint" style="margin-top:10px">Item not in the tracker? Skip the search and fill in the form below.</p>
     </div>
 
     <div class="card">
@@ -130,6 +120,15 @@
           <button type="button" data-found="Yes" class="on">Yes, it's here</button>
           <button type="button" data-found="No" class="no">No, not found</button>
         </div>
+
+        <label class="f">Photos * (up to 4, for the eBay listing)</label>
+        <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
+        <input type="file" id="gal-input" accept="image/*" multiple class="hidden">
+        <div class="row" style="margin-top:0">
+          <button type="button" id="cam-btn">Take photo</button>
+          <button type="button" class="alt" id="gal-btn">Choose from gallery</button>
+        </div>
+        <div class="shots" id="shots"></div>
 
         <label class="f" for="f-itemName">Item Name *</label>
         <input type="text" id="f-itemName" maxlength="120" autocomplete="off">
@@ -695,7 +694,6 @@ if (typeof module !== 'undefined') module.exports = Logic;
   var MAX_PHOTOS = 4;
 
   var LIBS = {
-    ocr: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
     xlsx: 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js',
     barcode: 'https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js'
   };
@@ -875,8 +873,7 @@ if (typeof module !== 'undefined') module.exports = Logic;
     setVal('auditedBy', state.settings.lastAuditor);
     $('form-title').textContent = '2. Item details';
     $('save-btn').textContent = 'Save item';
-    hide($('form-error')); hide($('scan-status')); hide($('scan-progress'));
-    $('scan-results').innerHTML = '';
+    hide($('form-error')); hide($('scan-status'));
     renderShots(); renderInfo();
   }
 
@@ -892,7 +889,7 @@ if (typeof module !== 'undefined') module.exports = Logic;
 
   function fillFromRow(i) {
     var item = sheetItem(i);
-    $('scan-results').innerHTML = ''; $('search-results').innerHTML = ''; $('sheet-search').value = '';
+    $('search-results').innerHTML = ''; $('sheet-search').value = '';
     var found = existingFor(item, i);
     if (found) {
       var keep = state.form.photos;
@@ -1003,7 +1000,6 @@ if (typeof module !== 'undefined') module.exports = Logic;
   }
 
   /* ---------- Photos and scanning ---------- */
-  var ocrWorker = null;
   function loadImage(file) {
     return new Promise(function (res, rej) {
       var url = URL.createObjectURL(file), img = new Image();
@@ -1020,24 +1016,6 @@ if (typeof module !== 'undefined') module.exports = Logic;
     c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
     return c;
   }
-  function readBarcodes(canvas) {
-    if (!('BarcodeDetector' in window)) return Promise.resolve([]);
-    try {
-      return new window.BarcodeDetector().detect(canvas).then(function (codes) {
-        return codes.map(function (c) { return c.rawValue; }).filter(Boolean);
-      }).catch(function () { return []; });
-    } catch (e) { return Promise.resolve([]); }
-  }
-  function readText(canvas) {
-    var bar = $('scan-progress');
-    return loadLib('ocr').then(function () {
-      if (ocrWorker) return ocrWorker;
-      return window.Tesseract.createWorker('eng', 1, {
-        logger: function (m) { if (m && m.status === 'recognizing text') bar.value = Math.round((m.progress || 0) * 100); }
-      }).then(function (w) { ocrWorker = w; return w; });
-    }).then(function (w) { return w.recognize(canvas); })
-      .then(function (r) { return (r && r.data && r.data.text) || ''; });
-  }
 
   function onPhotos(input) {
     var files = Array.prototype.slice.call(input.files || []);
@@ -1047,72 +1025,22 @@ if (typeof module !== 'undefined') module.exports = Logic;
     if (room <= 0) { toast('You can add up to 4 photos. Remove one first.'); return; }
     if (files.length > room) toast('Only ' + room + ' more photo' + (room === 1 ? '' : 's') + ' can be added.');
     files = files.slice(0, room);
-    var bad = files.filter(function (f) { return !/^image\//.test(f.type); });
-    if (bad.length) { show($('scan-status'), 'That file is not a photo. Please choose a JPG or PNG picture.', 'err'); return; }
-    var shouldScan = state.form.sheetRow == null && !state.form.editingId;
-    var firstCanvas = null;
+    if (files.some(function (f) { return !/^image\//.test(f.type); })) {
+      formError('That file is not a photo. Please choose a JPG or PNG picture.', null);
+      return;
+    }
     files.reduce(function (p, f) {
       return p.then(function () {
         return loadImage(f).then(function (img) {
-          var c = drawScaled(img, 1280);
-          if (!firstCanvas) firstCanvas = c;
-          state.form.photos.push({ full: c.toDataURL('image/jpeg', 0.72), thumb: drawScaled(img, 200).toDataURL('image/jpeg', 0.6) });
+          state.form.photos.push({ full: drawScaled(img, 1280).toDataURL('image/jpeg', 0.72), thumb: drawScaled(img, 200).toDataURL('image/jpeg', 0.6) });
           renderShots();
         });
       });
     }, Promise.resolve()).then(function () {
       hide($('form-error'));
-      if (shouldScan && firstCanvas) return scan(firstCanvas);
-    }).catch(function (e) {
-      if (e && e.message === 'bad image') show($('scan-status'), 'That photo could not be opened. Please try another one.', 'err');
-      else show($('scan-status'), 'The photo could not be read. Try a closer, brighter photo, or search the tracker below.', 'err');
+    }).catch(function () {
+      formError('That photo could not be opened. Please try another one.', null);
     });
-  }
-
-  function scan(canvas) {
-    var status = $('scan-status'), bar = $('scan-progress');
-    $('scan-results').innerHTML = '';
-    show(status, 'Reading the photo. This can take a few seconds…', 'info');
-    bar.value = 0; bar.classList.remove('hidden');
-    return readBarcodes(canvas).then(function (codes) {
-      if (codes.length && showScan(codes.join(' '), true)) return null;
-      return readText(canvas).then(function (text) { showScan(codes.join(' ') + '\n' + text, false); });
-    }).catch(function (e) {
-      if (e && e.message === 'offline') show(status, 'The photo reader needs internet the first time. Connect and try again, or search the tracker below.', 'err');
-      else show(status, 'The photo could not be read. Try a closer, brighter photo, or search the tracker below.', 'err');
-    }).then(function () { bar.classList.add('hidden'); });
-  }
-
-  /* Shows what was found. Returns true if something useful was found. */
-  function showScan(text, barcodeOnly) {
-    var status = $('scan-status'), box = $('scan-results'), html = '', flatText = L.norm(text);
-    var known = state.items.filter(function (it) {
-      var s = L.norm(it.sku), t = L.norm(it.trackingNo);
-      return (s.length >= 5 && flatText.indexOf(s) >= 0) || (t.length >= 5 && flatText.indexOf(t) >= 0);
-    });
-    known.slice(0, 3).forEach(function (it) {
-      html += '<button type="button" class="pick" data-open="' + esc(it.id) + '"><b>Already saved: ' + esc(it.itemName) + '</b>' +
-        '<span>SKU ' + esc(it.sku) + ' — tap to open</span></button>';
-    });
-    var matches = state.sheet ? L.matchRows(state.index, text, 5) : [];
-    var set = state.sheet ? auditedSet() : {};
-    matches.forEach(function (m) { html += rowButton(m.row, set); });
-
-    if (!known.length && !matches.length) {
-      if (barcodeOnly) return false;
-      var lines = text.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(function (s) { return s.replace(/[^A-Za-z0-9]/g, '').length >= 3; });
-      if (!lines.length) show(status, 'No text was found in the photo. Try a closer, brighter photo of the label, or search the tracker below.', 'err');
-      else if (!state.sheet) show(status, 'The tracker is not loaded yet, so the app cannot look the item up. Load it on the List tab. You can also use the text below.', 'info');
-      else show(status, 'No match in the tracker. Search the tracker below, or use the text from the photo as the name.', 'info');
-      lines.slice(0, 4).forEach(function (ln) {
-        html += '<button type="button" class="pick" data-name="' + esc(ln.slice(0, 120)) + '"><b>' + esc(ln.slice(0, 120)) + '</b><span>Use as item name</span></button>';
-      });
-      box.innerHTML = html;
-      return false;
-    }
-    show(status, matches.length ? 'Tap the item that matches the photo.' : 'This item is already saved.', 'good');
-    box.innerHTML = html;
-    return true;
   }
 
   function rowButton(i, set) {
@@ -1453,14 +1381,8 @@ if (typeof module !== 'undefined') module.exports = Logic;
       if (!b) return;
       if (b.hasAttribute('data-row')) { fillFromRow(parseInt(b.getAttribute('data-row'), 10)); openTabKeep(); }
       else if (b.hasAttribute('data-open')) editItem(b.getAttribute('data-open'));
-      else if (b.hasAttribute('data-name')) {
-        setVal('itemName', b.getAttribute('data-name')); b.remove();
-        if (!getVal('sku')) setVal('sku', L.makeNewSku(state.settings.device, others(null).map(function (x) { return x.sku; })));
-        $('f-itemName').focus();
-      }
     }
     function openTabKeep() { if ($('tab-add').classList.contains('hidden')) { openTab('add'); $('item-form').scrollIntoView(); } }
-    $('scan-results').addEventListener('click', pickHandler);
     $('search-results').addEventListener('click', pickHandler);
     $('list-rows').addEventListener('click', pickHandler);
 
@@ -1551,7 +1473,7 @@ if (typeof module !== 'undefined') module.exports = Logic;
       clearForm();
       if (err) show($('form-error'), err, 'err');
       renderSheet(); refreshLists(); updateChip();
-      if (!state.sheet) show($('scan-status'), 'First time here? Load the tracker on the List tab so the app can find items.', 'info');
+      if (!state.sheet) show($('scan-status'), 'First time here? Load the tracker on the List tab so you can search it.', 'info');
       syncNow(true);
       window.__appReady = true;
     });
