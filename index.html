@@ -7,7 +7,7 @@
 <style>
   :root{
     --bg:#f3f5f7; --card:#ffffff; --ink:#17212b; --muted:#5d6b78; --line:#d9dfe5;
-    --brand:#0b6e75; --brand-dark:#07545a; --ok:#1c7c3c; --warn:#a15c00; --bad:#b3261e;
+    --brand:#1f3864; --brand-dark:#152848; --ok:#1c7c3c; --warn:#a15c00; --bad:#b3261e;
   }
   *{box-sizing:border-box}
   html,body{margin:0}
@@ -19,45 +19,58 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
   .card h2{font-size:16px;margin:0 0 10px}
   .hint{color:var(--muted);font-size:14px;margin:4px 0 10px}
-  label{display:block;font-size:14px;font-weight:600;margin:10px 0 4px}
-  input[type=text],input[type=number],input[type=url],input[type=search],select,textarea{
-    width:100%;padding:10px;border:1px solid #b9c2cb;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+  .small-hint{color:var(--muted);font-size:13px;margin-top:4px}
+  label.f{display:block;font-size:14px;font-weight:600;margin:12px 0 4px}
+  input[type=text],input[type=search],select,textarea{
+    width:100%;padding:10px;border:1px solid #b9c2cb;border-radius:8px;font:inherit;background:#fff;color:var(--ink);min-height:44px}
+  input:disabled{background:#eef2f5;color:var(--muted)}
   textarea{min-height:64px;resize:vertical}
-  input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid #8fd3d8;outline-offset:1px}
+  input:focus,select:focus,textarea:focus,button:focus-visible{outline:3px solid #9db4dc;outline-offset:1px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 12px}
-  @media (max-width:560px){.grid,.grid3{grid-template-columns:1fr}}
-  button,.btn{font:inherit;font-weight:600;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:8px;padding:10px 14px;cursor:pointer;display:inline-block;text-align:center}
-  button:hover,.btn:hover{background:var(--brand-dark)}
+  .grid .wide{grid-column:1/-1}
+  @media (max-width:560px){.grid{grid-template-columns:1fr}}
+  button{font:inherit;font-weight:600;border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:8px;padding:10px 14px;cursor:pointer;min-height:44px}
+  button:hover{background:var(--brand-dark)}
   button.alt{background:#fff;color:var(--brand)}
-  button.alt:hover{background:#e8f4f5}
+  button.alt:hover{background:#eaf0f9}
   button.danger{background:#fff;color:var(--bad);border-color:var(--bad)}
-  button.small{padding:6px 10px;font-size:14px}
+  button.small{padding:6px 10px;font-size:14px;min-height:36px}
   button:disabled{opacity:.5;cursor:not-allowed}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .inline{display:flex;gap:8px}
+  .inline input{flex:1}
   .msg{border-radius:8px;padding:10px 12px;margin-top:10px;font-size:14px}
   .msg.err{background:#fdecea;color:var(--bad);border:1px solid #f3b9b4}
-  .msg.info{background:#e8f4f5;color:#07545a;border:1px solid #b5dade}
+  .msg.info{background:#eaf0f9;color:#1f3864;border:1px solid #bccbe6}
   .msg.good{background:#e7f5ec;color:var(--ok);border:1px solid #b4dcc1}
+  .msg a{color:inherit;font-weight:600}
   .hidden{display:none !important}
-  #preview{max-width:100%;max-height:220px;border-radius:8px;border:1px solid var(--line);margin-top:10px;display:block}
+  .seg{display:flex;gap:8px}
+  .seg button{flex:1;background:#fff;color:var(--ink);border-color:#b9c2cb}
+  .seg button.on{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .seg button.on.no{background:var(--bad);border-color:var(--bad)}
+  .shots{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .shot{position:relative;width:84px;height:84px}
+  .shot img,.shot .online{width:100%;height:100%;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .shot .online{display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;color:var(--muted);background:#eef2f5;padding:4px}
+  .shot button{position:absolute;top:-8px;right:-8px;width:28px;height:28px;min-height:0;padding:0;border-radius:50%;background:var(--bad);border-color:var(--bad);font-size:16px;line-height:1}
   .pick{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:1px solid var(--line);margin-top:6px;font-weight:400}
-  .pick:hover{background:#eef7f8}
+  .pick:hover{background:#eef3fa}
   .pick b{display:block}
   .pick span{color:var(--muted);font-size:13px}
-  .tag{display:inline-block;font-size:12px;border-radius:999px;padding:2px 8px;background:#e7f5ec;color:var(--ok);margin-left:6px}
+  .tag{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;background:#e7f5ec;color:var(--ok);margin-left:6px;vertical-align:middle}
   .tag.wait{background:#fff4e0;color:var(--warn)}
+  .tag.bad{background:#fdecea;color:var(--bad)}
+  .tag.grey{background:#eef2f5;color:var(--muted)}
   .item{display:flex;gap:10px;border-top:1px solid var(--line);padding:10px 0}
   .item:first-child{border-top:0}
   .item img,.item .noimg{width:56px;height:56px;border-radius:8px;object-fit:cover;background:#e6eaee;flex:none}
   .item .body{flex:1;min-width:0}
   .item .name{font-weight:700;overflow-wrap:anywhere}
   .item .meta{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
-  .item .sku{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
   .item .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
-  table{border-collapse:collapse;width:100%;font-size:13px}
-  th,td{border:1px solid var(--line);padding:4px 6px;text-align:left;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
-  .scroll{overflow-x:auto}
+  details.sub{margin-top:12px}
+  details.sub>summary{cursor:pointer;font-weight:600;color:var(--brand)}
   nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;z-index:6}
   nav button{flex:1;border:0;border-radius:0;background:#fff;color:var(--muted);padding:14px 4px;font-size:14px}
   nav button:hover{background:#eef2f5}
@@ -72,8 +85,8 @@
     body > *:not(#print-area){display:none !important}
     #print-area{display:block}
     .label{width:2.6in;border:1px solid #000;border-radius:6px;padding:8px;margin:0 8px 8px 0;display:inline-block;vertical-align:top;page-break-inside:avoid;break-inside:avoid;color:#000}
-    .label .l-name{font-weight:700;font-size:13px;line-height:1.2;max-height:2.4em;overflow:hidden}
-    .label .l-sku{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;font-weight:700;margin-top:2px}
+    .label .l-name{font-weight:700;font-size:12px;line-height:1.2;max-height:2.4em;overflow:hidden}
+    .label .l-code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;font-weight:700;margin-top:2px}
     .label .l-loc{font-size:11px;margin-top:2px}
     .label svg{max-width:100%;height:auto;display:block;margin-top:4px}
   }
@@ -87,100 +100,94 @@
 </header>
 
 <main>
-  <!-- ADD TAB -->
+  <!-- AUDIT TAB -->
   <section id="tab-add">
     <div class="card">
-      <h2>1. Scan a photo</h2>
-      <p class="hint">Take a photo of the item's label, tag, or box. The app reads it and finds the item in your tracking sheet.</p>
-      <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
+      <h2>1. Photo and find the item</h2>
+      <p class="hint">Take a photo of the item. The app reads the label and finds it in the tracker. You can add up to 4 photos.</p>
+      <input type="file" id="cam-input" accept="image/*" capture="environment" class="hidden">
+      <input type="file" id="gal-input" accept="image/*" multiple class="hidden">
       <div class="row" style="margin-top:0">
-        <button type="button" id="photo-btn">Take or choose photo</button>
-        <button type="button" class="alt hidden" id="photo-clear">Remove photo</button>
+        <button type="button" id="cam-btn">Take photo</button>
+        <button type="button" class="alt" id="gal-btn">Choose from gallery</button>
       </div>
-      <img id="preview" class="hidden" alt="Photo of the item">
+      <div class="shots" id="shots"></div>
       <div id="scan-status" class="msg info hidden" role="status"></div>
       <progress id="scan-progress" class="hidden" max="100" value="0"></progress>
       <div id="scan-results"></div>
 
-      <label for="sheet-search">Or search the tracking sheet</label>
-      <input type="search" id="sheet-search" placeholder="Type a name, number, or location">
+      <label class="f" for="sheet-search">Or search the tracker</label>
+      <input type="search" id="sheet-search" placeholder="Name, part number, Tracking #, or eBay #">
       <div id="search-results"></div>
     </div>
 
     <div class="card">
       <h2 id="form-title">2. Item details</h2>
+      <div id="info-box" class="msg info hidden"></div>
       <form id="item-form" novalidate>
-        <label for="f-name">Item name *</label>
-        <input type="text" id="f-name" maxlength="120" autocomplete="off">
+        <label class="f">Found in the warehouse? *</label>
+        <div class="seg" id="found-seg">
+          <button type="button" data-found="Yes" class="on">Yes, it's here</button>
+          <button type="button" data-found="No" class="no">No, not found</button>
+        </div>
 
-        <label for="f-desc">Description</label>
-        <input type="text" id="f-desc" maxlength="200" autocomplete="off">
+        <label class="f" for="f-itemName">Item Name *</label>
+        <input type="text" id="f-itemName" maxlength="120" autocomplete="off">
+
+        <label class="f" for="f-description">Description (if needed)</label>
+        <textarea id="f-description" maxlength="1000"></textarea>
 
         <div class="grid">
           <div>
-            <label for="f-cat">Category</label>
-            <input type="text" id="f-cat" list="dl-cat" maxlength="40" autocomplete="off">
+            <label class="f" for="f-trackingNo">Tracking sheet ID (Tracking #)</label>
+            <input type="text" id="f-trackingNo" maxlength="30" autocomplete="off" autocapitalize="characters">
           </div>
           <div>
-            <label for="f-sheetid">Tracking sheet ID</label>
-            <input type="text" id="f-sheetid" maxlength="60" autocomplete="off">
-          </div>
-        </div>
-
-        <div class="grid3">
-          <div>
-            <label for="f-site">Location / site *</label>
-            <input type="text" id="f-site" list="dl-site" maxlength="60" autocomplete="off">
+            <label class="f" for="f-category">Category (eBay Category)</label>
+            <input type="text" id="f-category" list="dl-category" maxlength="80" autocomplete="off">
           </div>
           <div>
-            <label for="f-area">Area or aisle</label>
-            <input type="text" id="f-area" list="dl-area" maxlength="40" autocomplete="off">
+            <label class="f" for="f-quantity">Quantity *</label>
+            <input type="text" id="f-quantity" inputmode="numeric" maxlength="6" autocomplete="off">
+            <div class="small-hint" id="qty-hint"></div>
           </div>
           <div>
-            <label for="f-bin">Shelf or bin</label>
-            <input type="text" id="f-bin" maxlength="40" autocomplete="off">
-          </div>
-        </div>
-
-        <div class="grid3">
-          <div>
-            <label for="f-qty">Quantity counted *</label>
-            <input type="number" id="f-qty" min="0" step="any" inputmode="decimal">
-          </div>
-          <div>
-            <label for="f-unit">Unit</label>
-            <input type="text" id="f-unit" list="dl-unit" maxlength="20" autocomplete="off">
-          </div>
-          <div>
-            <label for="f-cond">Condition</label>
-            <select id="f-cond">
-              <option>Good</option>
-              <option>Damaged</option>
-              <option>Needs review</option>
+            <label class="f" for="f-condition">Condition *</label>
+            <select id="f-condition">
+              <option value="">Choose…</option>
+              <option>New</option>
+              <option>Used</option>
+              <option>Open Box</option>
+              <option>New - Open Box</option>
+              <option>Pre-owned - Good</option>
+              <option>Remanufactured</option>
             </select>
           </div>
-        </div>
-
-        <label for="f-notes">Notes</label>
-        <textarea id="f-notes" maxlength="500"></textarea>
-
-        <div class="grid">
           <div>
-            <label for="f-sku">SKU *</label>
-            <input type="text" id="f-sku" maxlength="40" autocomplete="off" autocapitalize="characters">
+            <label class="f" for="f-sku">SKU *</label>
+            <div class="inline">
+              <input type="text" id="f-sku" maxlength="40" autocomplete="off" autocapitalize="characters">
+              <button type="button" class="alt" id="sku-btn">Make</button>
+            </div>
           </div>
           <div>
-            <label for="f-by">Audited by</label>
-            <input type="text" id="f-by" maxlength="60" autocomplete="name">
+            <label class="f" for="f-auditedBy">Audited by *</label>
+            <select id="f-auditedBy">
+              <option value="">Choose…</option>
+              <option>Travis</option>
+              <option>VA</option>
+              <option>Brad</option>
+            </select>
+          </div>
+          <div class="wide">
+            <label class="f" for="f-shelf">Shelf / Bin (optional)</label>
+            <input type="text" id="f-shelf" list="dl-shelf" maxlength="40" autocomplete="off">
           </div>
         </div>
-        <p class="hint">The SKU is made for you from the category and location. You can change it.</p>
 
         <div id="form-error" class="msg err hidden" role="alert"></div>
-
         <div class="row">
           <button type="submit" id="save-btn">Save item</button>
-          <button type="button" class="alt" id="newsku-btn">Make new SKU</button>
           <button type="button" class="alt" id="clear-btn">Clear form</button>
         </div>
       </form>
@@ -188,18 +195,61 @@
     </div>
   </section>
 
-  <!-- ITEMS TAB -->
-  <section id="tab-items" class="hidden">
+  <!-- LIST TAB -->
+  <section id="tab-list" class="hidden">
     <div class="card">
-      <h2>Recorded items</h2>
+      <h2>Tracker list</h2>
+      <p class="hint">Load the eBay Listing Audit Tracker once on each device. Then use this list to check each item in the warehouse.</p>
+      <input type="file" id="sheet-input" accept=".csv,.tsv,.txt,.xlsx,.xls" class="hidden">
+      <div class="row" style="margin-top:0">
+        <button type="button" id="sheet-btn">Load from file</button>
+        <button type="button" class="alt" id="gsheet-btn">Load from Google Sheet</button>
+      </div>
+      <div id="sheet-status" class="msg info hidden" role="status"></div>
+      <details class="sub hidden" id="map-box">
+        <summary>Check the columns</summary>
+        <p class="hint">The app guessed which column holds each detail. Change any that are wrong.</p>
+        <div class="grid" id="map-grid"></div>
+      </details>
+    </div>
+    <div class="card hidden" id="list-card">
       <div class="grid">
         <div>
-          <label for="item-search">Search</label>
-          <input type="search" id="item-search" placeholder="Name, SKU, or location">
+          <label class="f" for="list-search">Search</label>
+          <input type="search" id="list-search" placeholder="Name, part number, Tracking #">
         </div>
         <div>
-          <label for="item-site">Location</label>
-          <select id="item-site"><option value="">All locations</option></select>
+          <label class="f" for="list-filter">Show</label>
+          <select id="list-filter">
+            <option value="todo">Not audited yet</option>
+            <option value="done">Audited</option>
+            <option value="all">All items</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint" id="list-count"></p>
+      <div id="list-rows"></div>
+      <div class="row"><button type="button" class="alt hidden" id="list-more">Show more</button></div>
+    </div>
+  </section>
+
+  <!-- RECORDS TAB -->
+  <section id="tab-items" class="hidden">
+    <div class="card">
+      <h2>Saved audits</h2>
+      <div class="grid">
+        <div>
+          <label class="f" for="item-search">Search</label>
+          <input type="search" id="item-search" placeholder="Name, SKU, Tracking #, shelf">
+        </div>
+        <div>
+          <label class="f" for="item-filter">Show</label>
+          <select id="item-filter">
+            <option value="">All saved audits</option>
+            <option value="found">Found</option>
+            <option value="notfound">Not found</option>
+            <option value="diff">Count differs from eBay</option>
+          </select>
         </div>
       </div>
       <div class="row">
@@ -212,75 +262,93 @@
     </div>
   </section>
 
-  <!-- SHEET TAB -->
-  <section id="tab-sheet" class="hidden">
-    <div class="card">
-      <h2>Tracking sheet</h2>
-      <p class="hint">Load your tracking sheet once on each device. Use a CSV or Excel file. From Google Sheets: File &gt; Download &gt; CSV.</p>
-      <input type="file" id="sheet-input" accept=".csv,.tsv,.txt,.xlsx,.xls" class="hidden">
-      <div class="row" style="margin-top:0">
-        <button type="button" id="sheet-btn">Load tracking sheet</button>
-        <button type="button" class="danger hidden" id="sheet-remove">Remove sheet</button>
-      </div>
-      <div id="sheet-status" class="msg info hidden" role="status"></div>
-    </div>
-    <div class="card hidden" id="map-card">
-      <h2>Match your columns</h2>
-      <p class="hint">Tell the app which column holds each detail. It has made a first guess.</p>
-      <div class="grid" id="map-grid"></div>
-      <h2 style="margin-top:16px">First rows</h2>
-      <div class="scroll"><table id="sheet-preview"></table></div>
-    </div>
-  </section>
-
   <!-- SETTINGS TAB -->
   <section id="tab-settings" class="hidden">
     <div class="card">
-      <h2>Your details</h2>
-      <label for="s-name">Your name (goes on each record)</label>
-      <input type="text" id="s-name" maxlength="60" autocomplete="name">
-      <label for="s-device">Device code (2 letters or numbers, part of each SKU)</label>
+      <h2>This device</h2>
+      <label class="f" for="s-device">Device code (2 letters or numbers, used in new SKUs)</label>
       <input type="text" id="s-device" maxlength="2" autocapitalize="characters" autocomplete="off">
       <p class="hint">Each phone or computer needs its own code. This stops two people from making the same SKU.</p>
       <div id="settings-msg" class="msg err hidden" role="alert"></div>
-      <div class="row"><button type="button" id="s-save">Save details</button></div>
+      <div class="row"><button type="button" id="s-save">Save code</button></div>
     </div>
 
     <div class="card">
-      <h2>Send records to a Google Sheet (optional)</h2>
-      <p class="hint">Do this once so every device saves to the same online sheet. Staff do not need to log in.</p>
+      <h2>Connect your Google Sheet (optional)</h2>
+      <p class="hint">Do this once. Then every device can load the tracker from the sheet, and saved audits go to a tab called "App Audit". Photos go to a Google Drive folder called "Inventory Audit Photos". Staff do not need to log in.</p>
       <ol>
-        <li>Open a Google Sheet. Go to Extensions &gt; Apps Script.</li>
-        <li>Delete what is there. Paste the script below. Save.</li>
+        <li>Open the eBay Listing Audit Tracker in Google Sheets. The list tab must be named "Listing Tracker".</li>
+        <li>Go to Extensions &gt; Apps Script. Delete what is there, paste the script below, and save.</li>
         <li>Click Deploy &gt; New deployment &gt; Web app.</li>
-        <li>Set "Execute as" to Me and "Who has access" to Anyone. Click Deploy.</li>
+        <li>Set "Execute as" to Me and "Who has access" to Anyone. Click Deploy and allow access.</li>
         <li>Copy the web app link and paste it here.</li>
       </ol>
-      <label for="script-box">Script to paste</label>
-      <textarea id="script-box" readonly spellcheck="false">var HEAD = ['SKU','Name','Description','Category','Site','Area','Shelf/Bin','Qty','Unit','Condition','Sheet ID','Notes','Audited by','Audited at','Updated at'];
-var KEYS = ['sku','name','description','category','site','area','bin','qty','unit','condition','sheetId','notes','auditedBy','auditedAt','updatedAt'];
+      <p class="hint">Already set up an older script? Replace it, then use Deploy &gt; Manage deployments &gt; Edit &gt; New version.</p>
+      <label class="f" for="script-box">Script to paste</label>
+      <textarea id="script-box" readonly spellcheck="false">var TRACKER_TAB = 'Listing Tracker';
+var AUDIT_TAB = 'App Audit';
+var KEY = 'App Record ID';
+var FOLDER = 'Inventory Audit Photos';
+
+function doGet(e) {
+  var p = (e && e.parameter) || {};
+  if (p.action !== 'list') return out({ ok: true });
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var t = ss.getSheetByName(TRACKER_TAB);
+  if (!t) return out({ ok: false, error: 'No tab named ' + TRACKER_TAB });
+  var rows = t.getDataRange().getDisplayValues();
+  var audited = [];
+  var a = ss.getSheetByName(AUDIT_TAB);
+  if (a && a.getLastRow() > 1) {
+    var head = a.getRange(1, 1, 1, a.getLastColumn()).getValues()[0].map(String);
+    var c = head.indexOf('Tracking #');
+    if (c >= 0) {
+      audited = a.getRange(2, c + 1, a.getLastRow() - 1, 1).getDisplayValues()
+        .map(function (r) { return r[0]; }).filter(String);
+    }
+  }
+  return out({ ok: true, rows: rows, audited: audited });
+}
 
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  lock.waitLock(20000);
+  lock.waitLock(30000);
   try {
     var d = JSON.parse(e.postData.contents);
     var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var sh = ss.getSheetByName('Audit') || ss.insertSheet('Audit');
-    if (sh.getLastRow() === 0) sh.appendRow(HEAD);
+    var sh = ss.getSheetByName(AUDIT_TAB) || ss.insertSheet(AUDIT_TAB);
+    var head = d.headers || [];
+    if (sh.getLastRow() === 0) { sh.appendRow(head); sh.setFrozenRows(1); }
+    var cur = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+    head.forEach(function (h) {
+      if (cur.indexOf(h) === -1) { cur.push(h); sh.getRange(1, cur.length).setValue(h); }
+    });
+    var keyCol = cur.indexOf(KEY);
     var last = sh.getLastRow();
-    var skus = last > 1 ? sh.getRange(2, 1, last - 1, 1).getValues().map(function (r) { return String(r[0]); }) : [];
-    (d.records || []).forEach(function (r) {
-      var row = KEYS.map(function (k) { return r[k] == null ? '' : r[k]; });
-      var i = skus.indexOf(String(r.sku));
+    var ids = last > 1 ? sh.getRange(2, keyCol + 1, last - 1, 1).getValues().map(function (r) { return String(r[0]); }) : [];
+    var links = [];
+    if (d.record) {
+      var rec = d.record;
+      links = rec['Photo Links'] ? String(rec['Photo Links']).split('\n').filter(String) : [];
+      if (d.photos && d.photos.length) {
+        var folder = getFolder();
+        var base = rec['SKU'] || rec[KEY];
+        d.photos.forEach(function (p, i) {
+          var blob = Utilities.newBlob(Utilities.base64Decode(p), 'image/jpeg', base + '-' + (links.length + i + 1) + '.jpg');
+          links.push(folder.createFile(blob).getUrl());
+        });
+      }
+      rec['Photo Links'] = links.join('\n');
+      var row = cur.map(function (h) { return rec[h] == null ? '' : rec[h]; });
+      var i = ids.indexOf(String(rec[KEY]));
       if (i >= 0) sh.getRange(i + 2, 1, 1, row.length).setValues([row]);
-      else { sh.appendRow(row); skus.push(String(r.sku)); }
+      else { sh.appendRow(row); ids.push(String(rec[KEY])); }
+    }
+    (d.deleted || []).forEach(function (id) {
+      var j = ids.indexOf(String(id));
+      if (j >= 0) { sh.deleteRow(j + 2); ids.splice(j, 1); }
     });
-    (d.deleted || []).forEach(function (s) {
-      var i = skus.indexOf(String(s));
-      if (i >= 0) { sh.deleteRow(i + 2); skus.splice(i, 1); }
-    });
-    return out({ ok: true, saved: (d.records || []).length });
+    return out({ ok: true, photoLinks: links });
   } catch (err) {
     return out({ ok: false, error: String(err) });
   } finally {
@@ -288,40 +356,41 @@ function doPost(e) {
   }
 }
 
-function doGet() { return out({ ok: true }); }
+function getFolder() {
+  var it = DriveApp.getFoldersByName(FOLDER);
+  return it.hasNext() ? it.next() : DriveApp.createFolder(FOLDER);
+}
 
 function out(o) {
   return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
 }</textarea>
       <div class="row" style="margin-top:6px"><button type="button" class="alt small" id="copy-script">Copy script</button></div>
-      <label for="s-url">Web app link</label>
-      <input type="url" id="s-url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+      <label class="f" for="s-url">Web app link</label>
+      <input type="text" inputmode="url" id="s-url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
       <div id="sync-msg" class="msg info hidden" role="status"></div>
       <div class="row">
         <button type="button" id="s-url-save">Save link</button>
-        <button type="button" class="alt" id="sync-now">Send records now</button>
+        <button type="button" class="alt" id="sync-now">Send audits now</button>
       </div>
     </div>
 
     <div class="card">
       <h2>Clear this device</h2>
-      <p class="hint">This deletes all records and the tracking sheet from this device only. Download the CSV first.</p>
+      <p class="hint">This deletes all saved audits, photos, and the tracker list from this device only. Download the CSV and photos first.</p>
       <button type="button" class="danger" id="wipe-btn">Delete everything on this device</button>
     </div>
   </section>
 </main>
 
 <nav aria-label="Main">
-  <button type="button" data-tab="add" class="on">Scan &amp; Add</button>
-  <button type="button" data-tab="items">Items</button>
-  <button type="button" data-tab="sheet">Sheet</button>
+  <button type="button" data-tab="add" class="on">Audit</button>
+  <button type="button" data-tab="list">List</button>
+  <button type="button" data-tab="items">Saved</button>
   <button type="button" data-tab="settings">Settings</button>
 </nav>
 
-<datalist id="dl-cat"></datalist>
-<datalist id="dl-site"></datalist>
-<datalist id="dl-area"></datalist>
-<datalist id="dl-unit"></datalist>
+<datalist id="dl-category"></datalist>
+<datalist id="dl-shelf"></datalist>
 
 <div id="toast" class="hidden" role="status"></div>
 <div id="print-area"></div>
@@ -329,13 +398,32 @@ function out(o) {
 <script id="logic">
 /* ---------- Pure logic (no page access) ---------- */
 var Logic = (function () {
-  var STOP = { the:1, and:1, for:1, with:1, of:1, to:1, in:1, on:1, by:1, no:1, pcs:1, each:1 };
+  var STOP = { the:1, and:1, for:1, with:1, of:1, to:1, in:1, on:1, by:1, no:1, pcs:1, each:1, new:1, used:1, filter:1 };
+  var CONDITIONS = ['New', 'Used', 'Open Box', 'New - Open Box', 'Pre-owned - Good', 'Remanufactured'];
+  var AUDITORS = ['Travis', 'VA', 'Brad'];
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
+  function norm(s) { return String(s == null ? '' : s).toLowerCase().replace(/[^a-z0-9]/g, ''); }
+
+  var SHEET_FIELDS = [
+    { key: 'trackingNo', label: 'Tracking #', re: /tracking/ },
+    { key: 'ebayItemNo', label: 'eBay Item #', re: /item\s*(#|no\b|num|number|id)|listing\s*id/ },
+    { key: 'sku', label: 'SKU', re: /\bsku\b|custom\s*label/ },
+    { key: 'title', label: 'Title', re: /title|item\s*name|product\s*name|^name$|description/ },
+    { key: 'condition', label: 'Condition', re: /condition/ },
+    { key: 'category', label: 'eBay Category', re: /categ/ },
+    { key: 'qty', label: 'Qty Available', re: /qty|quant|available/ },
+    { key: 'price', label: 'Current Price ($)', re: /price/ },
+    { key: 'shelf', label: 'Warehouse Location (Shelf/Bin)', re: /shelf|\bbin\b|warehouse\s*loc/ }
+  ];
+  var BY = {};
+  SHEET_FIELDS.forEach(function (f) { BY[f.key] = f; });
+  var GUESS_ORDER = ['ebayItemNo', 'trackingNo', 'sku', 'shelf', 'qty', 'price', 'condition', 'category', 'title'];
+  var SKIP_RE = /comp|new\s*ebay|travis|\bva\b|audit|justif|note|verified|accurate|reasonable|prepared|sign|spot|went\s*live|located/;
 
   function parseCSV(text) {
     text = String(text || '').replace(/^﻿/, '');
@@ -374,112 +462,143 @@ var Logic = (function () {
     }).join('\r\n');
   }
 
-  /* Turn raw rows into {headers, rows}: first non-empty row is the header. */
+  var LABEL_NORMS = {};
+  SHEET_FIELDS.forEach(function (f) { LABEL_NORMS[norm(f.label)] = 1; });
+
+  /* Finds the header row, even with title and group rows above it. */
+  function findHeaderRow(rows) {
+    var best = -1, bestScore = 0, limit = Math.min(rows.length, 15);
+    for (var r = 0; r < limit; r++) {
+      var score = 0;
+      rows[r].forEach(function (v) {
+        if (!v) return;
+        if (LABEL_NORMS[norm(v)]) { score += 2; return; }
+        var low = v.toLowerCase();
+        if (v.length <= 40 && GUESS_ORDER.some(function (k) { return BY[k].re.test(low); })) score += 1;
+      });
+      if (score > bestScore) { bestScore = score; best = r; }
+    }
+    if (best >= 0 && bestScore >= 2) return best;
+    for (var j = 0; j < rows.length; j++) {
+      if (rows[j].filter(function (v) { return v !== ''; }).length >= 2) return j;
+    }
+    return 0;
+  }
+
+  /* Returns {headers, rows}. Skips empty rows and rows with only one filled cell (like spare TRK numbers). */
   function shapeSheet(raw) {
     var clean = (raw || []).map(function (r) {
       return (r || []).map(function (v) { return String(v == null ? '' : v).trim(); });
     }).filter(function (r) { return r.some(function (v) { return v !== ''; }); });
     if (clean.length < 2) return null;
-    var width = clean.reduce(function (m, r) { return Math.max(m, r.length); }, 0);
+    var h = findHeaderRow(clean);
+    var width = clean.slice(h).reduce(function (m, r) { return Math.max(m, r.length); }, 0);
     var headers = [];
-    for (var i = 0; i < width; i++) headers.push(clean[0][i] || ('Column ' + (i + 1)));
-    var rows = clean.slice(1).map(function (r) {
+    for (var i = 0; i < width; i++) headers.push(clean[h][i] || ('Column ' + (i + 1)));
+    var rows = clean.slice(h + 1).filter(function (r) {
+      return r.filter(function (v) { return v !== ''; }).length >= 2;
+    }).map(function (r) {
       var out = [];
       for (var j = 0; j < width; j++) out.push(r[j] || '');
       return out;
     });
+    if (!rows.length) return null;
     return { headers: headers, rows: rows };
   }
 
-  var FIELDS = [
-    { key: 'id', label: 'Item number / ID', re: /\b(sku|upc|barcode|code|id)\b|(item|part|stock|product|material)\s*(no|#|num|number|id|code)/ },
-    { key: 'desc', label: 'Description', re: /desc|detail/ },
-    { key: 'qty', label: 'Quantity', re: /qty|quant|count|on\s*hand|stock/ },
-    { key: 'unit', label: 'Unit', re: /\bunit|uom|measure/ },
-    { key: 'category', label: 'Category', re: /categ|type|class|group|dept/ },
-    { key: 'location', label: 'Location', re: /loc|site|warehouse|\bbin\b|shelf|area|store|yard|building/ },
-    { key: 'name', label: 'Item name', re: /name|item|product|title|material/ }
-  ];
-
   function guessMapping(headers) {
-    var map = {}, used = {};
-    FIELDS.forEach(function (f) {
+    var map = {}, used = {}, hn = headers.map(norm);
+    SHEET_FIELDS.forEach(function (f) {
       map[f.key] = -1;
+      var i = hn.indexOf(norm(f.label));
+      if (i >= 0 && !used[i]) { map[f.key] = i; used[i] = 1; }
+    });
+    GUESS_ORDER.forEach(function (k) {
+      if (map[k] >= 0) return;
       for (var i = 0; i < headers.length; i++) {
-        if (used[i]) continue;
-        if (f.re.test(String(headers[i]).toLowerCase())) { map[f.key] = i; used[i] = 1; break; }
+        var low = String(headers[i]).toLowerCase();
+        if (used[i] || SKIP_RE.test(low)) continue;
+        if (BY[k].re.test(low)) { map[k] = i; used[i] = 1; break; }
       }
     });
     return map;
   }
 
-  function rowToFields(row, map) {
-    function get(k) { var i = map[k]; return (i >= 0 && row[i] != null) ? String(row[i]).trim() : ''; }
-    var name = get('name'), desc = get('desc');
-    if (!name) { name = desc; desc = ''; }
-    var q = get('qty').replace(/,/g, ''), qty = '';
-    if (q !== '' && isFinite(Number(q))) qty = String(Number(q));
-    return { sheetId: get('id'), name: name, description: desc, category: get('category'), site: get('location'), qty: qty, unit: get('unit') };
+  function rowToItem(row, map) {
+    var o = {};
+    SHEET_FIELDS.forEach(function (f) {
+      var i = map[f.key];
+      o[f.key] = (i >= 0 && row[i] != null) ? String(row[i]).replace(/￼/g, '').replace(/\s+/g, ' ').trim() : '';
+    });
+    return o;
+  }
+
+  /* Maps tracker condition text to the app's 6 choices. Unknown values return ''. */
+  function normCondition(v) {
+    var s = String(v || '').toLowerCase().replace(/[–—_]/g, '-').replace(/\s+/g, ' ').trim();
+    if (s === 'new') return 'New';
+    if (s === 'used') return 'Used';
+    if (s === 'open box') return 'Open Box';
+    if (/^new ?- ?open box$/.test(s)) return 'New - Open Box';
+    if (/^pre-?owned ?- ?good$/.test(s)) return 'Pre-owned - Good';
+    if (s === 'remanufactured') return 'Remanufactured';
+    return '';
   }
 
   function tokens(s) {
     return (String(s || '').toLowerCase().match(/[a-z0-9]+/g) || []).filter(function (t) { return t.length >= 2 && !STOP[t]; });
   }
 
-  function flat(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
-
   function buildIndex(rows, map) {
+    var idCols = [map.trackingNo, map.ebayItemNo, map.sku].filter(function (i) { return i >= 0; });
     return rows.map(function (r) {
-      var text = r.join(' ').toLowerCase();
-      var set = {};
+      var text = r.join(' ').toLowerCase(), set = {};
       tokens(text).forEach(function (t) { set[t] = 1; });
-      return { tokens: Object.keys(set), text: text, idFlat: map.id >= 0 ? flat(r[map.id]) : '' };
+      var ids = idCols.map(function (c) { return norm(r[c]); }).filter(function (v) { return v.length >= 5; });
+      return { tokens: Object.keys(set), text: text, ids: ids };
     });
   }
 
-  /* Score each sheet row against the text read from a photo. Returns best rows first. */
   function matchRows(index, text, limit) {
     var seen = {};
     tokens(text).forEach(function (t) { seen[t] = 1; });
-    var all = flat(text), out = [];
+    var all = norm(text), out = [];
     for (var i = 0; i < index.length; i++) {
       var e = index[i], score = 0;
       for (var j = 0; j < e.tokens.length; j++) {
         var t = e.tokens[j];
-        if (seen[t]) score += (/\d/.test(t) && t.length >= 4) ? 3 : (t.length >= 3 ? 1 : 0);
+        if (seen[t]) score += (/\d/.test(t) && t.length >= 3) ? 3 : (t.length >= 3 ? 1 : 0);
       }
-      if (e.idFlat.length >= 4 && all.indexOf(e.idFlat) >= 0) score += 10;
-      if (score >= 2) out.push({ row: i, score: score });
+      for (var k = 0; k < e.ids.length; k++) if (all.indexOf(e.ids[k]) >= 0) score += 10;
+      if (score >= 3) out.push({ row: i, score: score });
     }
     out.sort(function (a, b) { return b.score - a.score || a.row - b.row; });
     return out.slice(0, limit || 5);
   }
 
-  function searchRows(index, query, limit) {
+  function searchRows(index, query, limit, filterFn) {
     var words = String(query || '').toLowerCase().split(/\s+/).filter(Boolean), out = [];
-    if (!words.length) return out;
-    for (var i = 0; i < index.length && out.length < (limit || 8); i++) {
+    for (var i = 0; i < index.length; i++) {
+      if (filterFn && !filterFn(i)) continue;
       var ok = true;
       for (var j = 0; j < words.length; j++) if (index[i].text.indexOf(words[j]) < 0) { ok = false; break; }
-      if (ok) out.push(i);
+      if (ok) { out.push(i); if (limit && out.length >= limit) break; }
     }
     return out;
   }
 
-  /* 3-character code. Keeps trailing numbers so "Warehouse 1" and "Warehouse 2" differ. */
-  function codeOf(s, fallback) {
-    var joined = String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (!joined) return fallback;
-    var digits = joined.replace(/[^0-9]/g, '').slice(-2);
-    var letters = joined.replace(/[0-9]/g, '');
-    var code = letters.slice(0, 3 - digits.length) + digits;
-    while (code.length < 3) code += 'X';
-    return code;
+  function pad4(n) { n = String(n); while (n.length < 4) n = '0' + n; return n; }
+
+  /* Uses the tracker SKU if there is one, else EB- plus the eBay Item #. */
+  function suggestSku(item) {
+    if (item.sku) return item.sku;
+    if (/^\d{9,15}$/.test(item.ebayItemNo || '')) return 'EB-' + item.ebayItemNo;
+    return '';
   }
 
-  function makeSku(category, site, device, existing) {
-    var prefix = codeOf(category, 'GEN') + '-' + codeOf(site, 'LOC') + '-' + String(device || 'A1').toUpperCase() + '-';
-    var max = 0;
+  /* For items not on the tracker: NEW-<device>-0001, NEW-<device>-0002, ... */
+  function makeNewSku(device, existing) {
+    var prefix = 'NEW-' + String(device || 'A1').toUpperCase() + '-', max = 0;
     (existing || []).forEach(function (s) {
       s = String(s || '').toUpperCase();
       if (s.indexOf(prefix) === 0) {
@@ -487,33 +606,83 @@ var Logic = (function () {
         if (isFinite(n) && n > max) max = n;
       }
     });
-    var num = String(max + 1);
-    while (num.length < 4) num = '0' + num;
-    return prefix + num;
+    return prefix + pad4(max + 1);
   }
 
-  function locationText(it) {
-    return [it.site, it.area, it.bin].filter(function (v) { return v; }).join(' > ');
+  function ebayLink(id) { return /^\d{9,15}$/.test(id || '') ? 'https://www.ebay.com/itm/' + id : ''; }
+
+  /* Returns {msg, field} for the first problem, or null. */
+  function validate(r, others) {
+    function bad(msg, field) { return { msg: msg, field: field }; }
+    if (r.found !== 'Yes' && r.found !== 'No') return bad('Please choose if the item is in the warehouse.', 'found');
+    if (!r.itemName) return bad('Please type the item name.', 'itemName');
+    if (r.found === 'Yes') {
+      if (!((r.photos && r.photos.length) || (r.photoLinks && r.photoLinks.length))) return bad('Please take at least one photo of the item.', 'photos');
+      if (r.quantity === '') return bad('Please type how many you counted.', 'quantity');
+      if (!/^\d+$/.test(r.quantity)) return bad('Quantity must be a whole number, like 3.', 'quantity');
+      if (Number(r.quantity) < 1) return bad('Quantity must be at least 1. If none are here, choose "No, not found".', 'quantity');
+      if (CONDITIONS.indexOf(r.condition) < 0) return bad('Please choose the condition.', 'condition');
+    }
+    if (!r.sku) return bad('Please add a SKU, or tap "Make".', 'sku');
+    if (!/^[A-Za-z0-9][A-Za-z0-9._\-]*$/.test(r.sku)) return bad('The SKU can use only letters, numbers, dashes, dots, and underscores.', 'sku');
+    if (AUDITORS.indexOf(r.auditedBy) < 0) return bad('Please choose who audited the item.', 'auditedBy');
+    var t = String(r.trackingNo || '').toLowerCase();
+    if (t) {
+      for (var i = 0; i < (others || []).length; i++) {
+        if (String(others[i].trackingNo || '').toLowerCase() === t) return bad('This Tracking # is already saved. Open it from the Saved tab to update it.', 'trackingNo');
+      }
+    }
+    return null;
   }
 
-  var EXPORT_HEAD = ['SKU', 'Name', 'Description', 'Category', 'Site', 'Area', 'Shelf/Bin', 'Qty', 'Unit', 'Condition', 'Sheet ID', 'Notes', 'Audited by', 'Audited at', 'Updated at'];
-  var EXPORT_KEYS = ['sku', 'name', 'description', 'category', 'site', 'area', 'bin', 'qty', 'unit', 'condition', 'sheetId', 'notes', 'auditedBy', 'auditedAt', 'updatedAt'];
-
-  function exportRows(items) {
-    return [EXPORT_HEAD].concat(items.map(function (it) {
-      return EXPORT_KEYS.map(function (k) { return it[k] == null ? '' : it[k]; });
-    }));
+  function skuClash(r, others) {
+    var s = String(r.sku || '').toUpperCase();
+    for (var i = 0; i < (others || []).length; i++) if (String(others[i].sku || '').toUpperCase() === s) return others[i];
+    return null;
   }
 
-  function plainRecord(it) {
-    var o = {};
-    EXPORT_KEYS.forEach(function (k) { o[k] = it[k] == null ? '' : it[k]; });
+  function qtyDiffers(r) {
+    if (r.found !== 'Yes' || r.ebayQty === '' || r.ebayQty == null || !/^\d+$/.test(String(r.ebayQty))) return false;
+    return Number(r.quantity) !== Number(r.ebayQty);
+  }
+
+  /* Converts records saved by older versions of the app. */
+  function migrate(old) {
+    if (!old || old.itemName !== undefined) return old;
+    var v2 = old.title !== undefined;
+    var shelf = old.warehouseLoc || [old.site, old.area, old.bin].filter(Boolean).join(' > ');
+    var sku = v2 ? (old.ebayItemNo ? 'EB-' + old.ebayItemNo : '') : (old.sku || '');
+    return {
+      id: old.id, itemName: (v2 ? old.title : old.name) || '', description: (v2 ? old.auditNotes : [old.description, old.notes].filter(Boolean).join(' | ')) || '',
+      trackingNo: v2 ? (old.trackingNo || '') : '', ebayItemNo: old.ebayItemNo || '', ebayQty: v2 ? (old.qtyAvailable || '') : '',
+      category: (v2 ? old.ebayCategory : old.category) || '', found: 'Yes',
+      quantity: v2 ? '' : (old.qty != null ? String(old.qty) : ''), condition: normCondition(old.condition),
+      sku: sku, shelf: shelf, auditedBy: AUDITORS.indexOf(old.auditedBy) >= 0 ? old.auditedBy : '',
+      auditDate: old.auditedAt || old.auditDate || '', updatedAt: old.updatedAt || '',
+      photos: [], photoLinks: [], thumb: old.thumb || '', sheetRow: null, synced: false, photosSent: true
+    };
+  }
+
+  var EXPORT_HEAD = ['Tracking #', 'eBay Item #', 'SKU', 'Item Name', 'Description', 'eBay Category', 'Found in Warehouse?',
+    'Quantity Counted', 'eBay Qty', 'Condition', 'Shelf/Bin', 'Audited By', 'Audit Date', 'Photo Links', 'App Record ID', 'Last Updated'];
+  function recordRow(r) {
+    return [r.trackingNo, r.ebayItemNo, r.sku, r.itemName, r.description, r.category, r.found, r.quantity, r.ebayQty,
+      r.condition, r.shelf, r.auditedBy, r.auditDate, (r.photoLinks || []).join('\n'), r.id, r.updatedAt]
+      .map(function (v) { return v == null ? '' : String(v); });
+  }
+  function exportRows(items) { return [EXPORT_HEAD].concat(items.map(recordRow)); }
+  function recordObject(r) {
+    var row = recordRow(r), o = {};
+    EXPORT_HEAD.forEach(function (h, i) { o[h] = /^[=+@]/.test(row[i]) ? "'" + row[i] : row[i]; });
     return o;
   }
 
-  return { esc: esc, parseCSV: parseCSV, toCSV: toCSV, shapeSheet: shapeSheet, FIELDS: FIELDS, guessMapping: guessMapping,
-    rowToFields: rowToFields, tokens: tokens, buildIndex: buildIndex, matchRows: matchRows, searchRows: searchRows,
-    codeOf: codeOf, makeSku: makeSku, locationText: locationText, exportRows: exportRows, plainRecord: plainRecord };
+  return { esc: esc, norm: norm, CONDITIONS: CONDITIONS, AUDITORS: AUDITORS, SHEET_FIELDS: SHEET_FIELDS,
+    parseCSV: parseCSV, toCSV: toCSV, findHeaderRow: findHeaderRow, shapeSheet: shapeSheet, guessMapping: guessMapping,
+    rowToItem: rowToItem, normCondition: normCondition, tokens: tokens, buildIndex: buildIndex, matchRows: matchRows,
+    searchRows: searchRows, suggestSku: suggestSku, makeNewSku: makeNewSku, ebayLink: ebayLink, validate: validate,
+    skuClash: skuClash, qtyDiffers: qtyDiffers, migrate: migrate, EXPORT_HEAD: EXPORT_HEAD, exportRows: exportRows,
+    recordObject: recordObject };
 })();
 if (typeof module !== 'undefined') module.exports = Logic;
 </script>
@@ -523,6 +692,7 @@ if (typeof module !== 'undefined') module.exports = Logic;
   'use strict';
   var L = Logic, esc = L.esc;
   var $ = function (id) { return document.getElementById(id); };
+  var MAX_PHOTOS = 4;
 
   var LIBS = {
     ocr: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
@@ -531,11 +701,11 @@ if (typeof module !== 'undefined') module.exports = Logic;
   };
 
   var state = {
-    items: [], sheet: null, index: [],
-    settings: { name: '', device: '', url: '' },
+    items: [], sheet: null, index: [], teamAudited: [],
+    settings: { device: '', url: '', lastAuditor: '' },
     pendingDeletes: [],
-    editingId: null, sheetRow: null, thumb: '', skuTouched: false,
-    shown: 100, lastSavedId: null, syncing: false, memoryOnly: false
+    form: { editingId: null, sheetRow: null, photos: [], photoLinks: [], thumb: '', info: null, found: 'Yes' },
+    listShown: 50, recShown: 100, lastSavedId: null, syncing: false, memoryOnly: false
   };
 
   /* ---------- Storage ---------- */
@@ -574,7 +744,7 @@ if (typeof module !== 'undefined') module.exports = Logic;
     }
   };
 
-  /* ---------- Small helpers ---------- */
+  /* ---------- Helpers ---------- */
   var toastTimer;
   function toast(text) {
     var t = $('toast');
@@ -610,106 +780,182 @@ if (typeof module !== 'undefined') module.exports = Logic;
     }
     return libCache[name];
   }
-  function allSkus(exceptId) {
-    return state.items.filter(function (it) { return it.id !== exceptId; }).map(function (it) { return it.sku; });
-  }
   function findItem(id) {
     for (var i = 0; i < state.items.length; i++) if (state.items[i].id === id) return state.items[i];
     return null;
   }
+  function others(id) { return state.items.filter(function (it) { return it.id !== id; }); }
+  function sheetItem(i) { return L.rowToItem(state.sheet.rows[i], state.sheet.map); }
+
+  function auditedSet() {
+    var set = {};
+    state.items.forEach(function (it) { if (it.trackingNo) set[it.trackingNo.toLowerCase()] = 1; });
+    state.teamAudited.forEach(function (t) { set[String(t).toLowerCase()] = 1; });
+    return set;
+  }
+  function rowAudited(i, set) {
+    for (var k = 0; k < state.items.length; k++) if (state.items[k].sheetRow === i) return true;
+    var t = state.sheet.map.trackingNo >= 0 ? String(state.sheet.rows[i][state.sheet.map.trackingNo] || '').toLowerCase() : '';
+    return !!(t && set[t]);
+  }
 
   /* ---------- Tabs ---------- */
   function openTab(name) {
-    ['add', 'items', 'sheet', 'settings'].forEach(function (t) {
-      $('tab-' + t).classList.toggle('hidden', t !== name);
-    });
+    ['add', 'list', 'items', 'settings'].forEach(function (t) { $('tab-' + t).classList.toggle('hidden', t !== name); });
     Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
       b.classList.toggle('on', b.getAttribute('data-tab') === name);
     });
     if (name === 'items') renderItems();
+    if (name === 'list') renderList();
     window.scrollTo(0, 0);
   }
 
   /* ---------- Form ---------- */
-  var F = ['name', 'desc', 'cat', 'sheetid', 'site', 'area', 'bin', 'qty', 'unit', 'cond', 'notes', 'sku', 'by'];
-  function val(k) { return $('f-' + k).value.trim(); }
+  var FIELDS = ['itemName', 'description', 'trackingNo', 'category', 'quantity', 'condition', 'sku', 'auditedBy', 'shelf'];
+  function getVal(k) { return $('f-' + k).value.trim(); }
   function setVal(k, v) { $('f-' + k).value = v == null ? '' : v; }
 
-  function refreshSku() {
-    if (state.skuTouched || state.editingId) return;
-    setVal('sku', L.makeSku(val('cat'), val('site'), state.settings.device, allSkus(null)));
+  function setFound(v) {
+    state.form.found = v;
+    Array.prototype.forEach.call(document.querySelectorAll('#found-seg button'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-found') === v);
+    });
+    var q = $('f-quantity');
+    if (v === 'No') { q.value = '0'; q.disabled = true; }
+    else { if (q.disabled) q.value = ''; q.disabled = false; }
+  }
+
+  function getForm() {
+    var r = {};
+    FIELDS.forEach(function (k) { r[k] = getVal(k); });
+    r.sku = r.sku.toUpperCase();
+    r.trackingNo = r.trackingNo.toUpperCase();
+    r.found = state.form.found;
+    if (r.found === 'No') r.quantity = '0';
+    r.photos = state.form.photos;
+    r.photoLinks = state.form.photoLinks;
+    var info = state.form.info || {};
+    r.ebayItemNo = info.ebayItemNo || '';
+    r.ebayQty = info.qty || '';
+    return r;
+  }
+
+  function renderInfo() {
+    var info = state.form.info, box = $('info-box'), hint = $('qty-hint');
+    if (!info) { hide(box); hint.textContent = ''; return; }
+    var parts = [];
+    if (info.trackingNo) parts.push('<b>' + esc(info.trackingNo) + '</b>');
+    if (info.ebayItemNo) parts.push('eBay # ' + esc(info.ebayItemNo));
+    if (info.qty) parts.push('On eBay: ' + esc(info.qty));
+    if (info.price) parts.push(esc(info.price));
+    var link = L.ebayLink(info.ebayItemNo);
+    box.innerHTML = 'From the tracker: ' + parts.join(' · ') +
+      (link ? ' · <a href="' + esc(link) + '" target="_blank" rel="noopener">Open on eBay</a>' : '');
+    box.className = 'msg info';
+    hint.textContent = info.qty ? 'On eBay: ' + info.qty + '. Type what you count.' : '';
+  }
+
+  function renderShots() {
+    var html = '';
+    state.form.photoLinks.forEach(function (link, i) {
+      html += '<div class="shot"><a class="online" href="' + esc(link) + '" target="_blank" rel="noopener">Saved online ' + (i + 1) + '</a>' +
+        '<button type="button" data-rmlink="' + i + '" aria-label="Remove online photo ' + (i + 1) + '">×</button></div>';
+    });
+    state.form.photos.forEach(function (p, i) {
+      html += '<div class="shot"><img src="' + esc(p.thumb) + '" alt="Photo ' + (i + 1) + '">' +
+        '<button type="button" data-rmphoto="' + i + '" aria-label="Remove photo ' + (i + 1) + '">×</button></div>';
+    });
+    $('shots').innerHTML = html;
   }
 
   function clearForm() {
-    F.forEach(function (k) { if (k !== 'cond' && k !== 'by') setVal(k, ''); });
-    $('f-cond').selectedIndex = 0;
-    setVal('by', state.settings.name);
-    state.editingId = null; state.sheetRow = null; state.thumb = ''; state.skuTouched = false;
+    FIELDS.forEach(function (k) { setVal(k, ''); });
+    state.form = { editingId: null, sheetRow: null, photos: [], photoLinks: [], thumb: '', info: null, found: 'Yes' };
+    setFound('Yes');
+    setVal('auditedBy', state.settings.lastAuditor);
     $('form-title').textContent = '2. Item details';
     $('save-btn').textContent = 'Save item';
-    hide($('form-error'));
-    clearPhoto();
-    refreshSku();
+    hide($('form-error')); hide($('scan-status')); hide($('scan-progress'));
+    $('scan-results').innerHTML = '';
+    renderShots(); renderInfo();
   }
 
-  function clearPhoto() {
-    $('photo-input').value = '';
-    var p = $('preview');
-    p.removeAttribute('src'); hide(p);
-    hide($('photo-clear')); hide($('scan-status')); hide($('scan-progress'));
-    $('scan-results').innerHTML = '';
-    if (!state.editingId) state.thumb = '';
+  function existingFor(item, row) {
+    var t = String(item.trackingNo || '').toLowerCase();
+    for (var i = 0; i < state.items.length; i++) {
+      var it = state.items[i];
+      if (row != null && it.sheetRow === row) return it;
+      if (t && String(it.trackingNo || '').toLowerCase() === t) return it;
+    }
+    return null;
   }
 
   function fillFromRow(i) {
-    var f = L.rowToFields(state.sheet.rows[i], state.sheet.map);
-    state.sheetRow = i;
-    setVal('name', f.name); setVal('desc', f.description); setVal('cat', f.category);
-    setVal('sheetid', f.sheetId); setVal('site', f.site); setVal('qty', f.qty); setVal('unit', f.unit);
-    refreshSku();
+    var item = sheetItem(i);
     $('scan-results').innerHTML = ''; $('search-results').innerHTML = ''; $('sheet-search').value = '';
-    show($('scan-status'), 'Filled in from the tracking sheet. Check the details, count the quantity, then save.', 'good');
-    $('f-qty').focus();
+    var found = existingFor(item, i);
+    if (found) {
+      var keep = state.form.photos;
+      editItem(found.id);
+      if (keep.length && !state.form.photos.length) { state.form.photos = keep.slice(0, MAX_PHOTOS - state.form.photoLinks.length); renderShots(); }
+      show($('scan-status'), 'This item is already saved. It is open so you can update it.', 'info');
+      return;
+    }
+    state.form.sheetRow = i;
+    state.form.info = item;
+    setVal('itemName', item.title);
+    setVal('trackingNo', item.trackingNo);
+    setVal('category', item.category);
+    setVal('condition', L.normCondition(item.condition));
+    setVal('shelf', item.shelf);
+    setVal('quantity', '');
+    setVal('sku', L.suggestSku(item) || L.makeNewSku(state.settings.device, others(null).map(function (x) { return x.sku; })));
+    if (!getVal('auditedBy')) setVal('auditedBy', state.settings.lastAuditor);
+    setFound('Yes');
+    renderInfo();
+    show($('scan-status'), 'Filled in from the tracker. Count the items, check the details, then save.', 'good');
+    $('item-form').scrollIntoView();
+    $('f-quantity').focus();
   }
 
   function formError(text, field) {
     show($('form-error'), text, 'err');
-    if (field) $('f-' + field).focus();
+    if (field === 'photos') $('cam-btn').focus();
+    else if (field === 'found') $('found-seg').querySelector('button').focus();
+    else if (field && $('f-' + field)) $('f-' + field).focus();
     return false;
   }
 
   function saveItem(ev) {
     ev.preventDefault();
     hide($('form-error')); hide($('saved-box'));
-    var sku = val('sku').toUpperCase(), qtyRaw = val('qty'), qty = Number(qtyRaw);
-    if (!val('name')) return formError('Please type the item name.', 'name');
-    if (!val('site')) return formError('Please type where the item is stored.', 'site');
-    if (qtyRaw === '' || !isFinite(qty)) return formError('Please type the quantity as a number, like 12.', 'qty');
-    if (qty < 0) return formError('The quantity cannot be less than 0.', 'qty');
-    if (!sku) return formError('Please add a SKU, or tap "Make new SKU".', 'sku');
-    if (!/^[A-Z0-9][A-Z0-9._\-]*$/.test(sku)) return formError('The SKU can use only letters, numbers, dashes, dots, and underscores.', 'sku');
-    var clash = allSkus(state.editingId).some(function (s) { return String(s).toUpperCase() === sku; });
-    if (clash) return formError('That SKU is already used by another item. Tap "Make new SKU".', 'sku');
+    var r = getForm(), oth = others(state.form.editingId);
+    var problem = L.validate(r, oth);
+    if (problem) return formError(problem.msg, problem.field);
+    var clash = L.skuClash(r, oth);
+    if (clash && !window.confirm('SKU ' + r.sku + ' is already used by "' + clash.itemName + '". Save anyway?')) { $('f-sku').focus(); return false; }
 
-    var old = state.editingId ? findItem(state.editingId) : null, stamp = nowText();
-    var it = {
-      id: old ? old.id : uid(), sku: sku, name: val('name'), description: val('desc'), category: val('cat'),
-      site: val('site'), area: val('area'), bin: val('bin'), qty: qty, unit: val('unit'),
-      condition: $('f-cond').value, sheetId: val('sheetid'), notes: val('notes'), auditedBy: val('by'),
-      auditedAt: old ? old.auditedAt : stamp, updatedAt: stamp,
-      sheetRow: state.sheetRow, thumb: state.thumb, synced: false
-    };
-    var renamed = old && old.sku !== sku;
-    if (renamed) state.pendingDeletes.push(old.sku);
+    var old = state.form.editingId ? findItem(state.form.editingId) : null, stamp = nowText();
+    var it = r;
+    it.id = old ? old.id : uid();
+    it.auditDate = old && old.auditDate ? old.auditDate : stamp;
+    it.updatedAt = stamp;
+    it.sheetRow = state.form.sheetRow;
+    it.photos = state.form.photos.slice();
+    it.photoLinks = state.form.photoLinks.slice();
+    it.thumb = it.photos.length ? it.photos[0].thumb : (old && it.photoLinks.length ? old.thumb : '');
+    it.synced = false;
+    it.photosSent = it.photos.length === 0;
+
+    state.settings.lastAuditor = it.auditedBy;
+    DB.setMeta('settings', state.settings).catch(function () {});
 
     var btn = $('save-btn'); btn.disabled = true;
     DB.putItem(it).then(function () {
-      return renamed ? DB.setMeta('pendingDeletes', state.pendingDeletes) : null;
-    }).then(function () {
       if (old) state.items[state.items.indexOf(old)] = it; else state.items.unshift(it);
       state.lastSavedId = it.id;
       clearForm();
-      $('saved-box').innerHTML = 'Saved <b>' + esc(it.name) + '</b> as <b>' + esc(it.sku) + '</b>. ' +
+      $('saved-box').innerHTML = 'Saved <b>' + esc(it.itemName) + '</b> (SKU ' + esc(it.sku) + '). ' +
         '<button type="button" class="small" id="print-last">Print label</button>';
       $('saved-box').classList.remove('hidden');
       refreshLists(); updateChip(); renderSheetStatus();
@@ -725,14 +971,18 @@ if (typeof module !== 'undefined') module.exports = Logic;
     var it = findItem(id);
     if (!it) return;
     clearForm();
-    state.editingId = id; state.sheetRow = it.sheetRow == null ? null : it.sheetRow; state.thumb = it.thumb || '';
-    setVal('name', it.name); setVal('desc', it.description); setVal('cat', it.category); setVal('sheetid', it.sheetId);
-    setVal('site', it.site); setVal('area', it.area); setVal('bin', it.bin); setVal('qty', it.qty); setVal('unit', it.unit);
-    $('f-cond').value = it.condition || 'Good';
-    setVal('notes', it.notes); setVal('sku', it.sku); setVal('by', it.auditedBy);
-    $('form-title').textContent = 'Edit item ' + it.sku;
+    state.form.editingId = id;
+    state.form.sheetRow = it.sheetRow == null ? null : it.sheetRow;
+    state.form.photos = (it.photos || []).slice();
+    state.form.photoLinks = (it.photoLinks || []).slice();
+    state.form.info = (it.trackingNo || it.ebayItemNo) ? { trackingNo: it.trackingNo, ebayItemNo: it.ebayItemNo, qty: it.ebayQty, price: '' } : null;
+    if (state.sheet && it.sheetRow != null && state.sheet.rows[it.sheetRow]) state.form.info.price = sheetItem(it.sheetRow).price;
+    FIELDS.forEach(function (k) { setVal(k, it[k]); });
+    setFound(it.found || 'Yes');
+    if (it.found === 'No') setVal('quantity', '0');
+    $('form-title').textContent = 'Edit: ' + (it.itemName.length > 40 ? it.itemName.slice(0, 40) + '…' : it.itemName);
     $('save-btn').textContent = 'Save changes';
-    if (it.thumb) { $('preview').src = it.thumb; $('preview').classList.remove('hidden'); }
+    renderShots(); renderInfo();
     hide($('saved-box'));
     openTab('add');
     $('item-form').scrollIntoView();
@@ -741,119 +991,18 @@ if (typeof module !== 'undefined') module.exports = Logic;
   function deleteItem(id) {
     var it = findItem(id);
     if (!it) return;
-    if (!window.confirm('Delete "' + it.name + '" (' + it.sku + ')? This cannot be undone.')) return;
-    state.pendingDeletes.push(it.sku);
+    if (!window.confirm('Delete "' + it.itemName + '"? This cannot be undone.')) return;
+    state.pendingDeletes.push(it.id);
     DB.delItem(id).then(function () { return DB.setMeta('pendingDeletes', state.pendingDeletes); }).then(function () {
       state.items.splice(state.items.indexOf(it), 1);
-      if (state.editingId === id) clearForm();
+      if (state.form.editingId === id) clearForm();
       refreshLists(); renderItems(); updateChip(); renderSheetStatus();
       toast('Item deleted.');
       syncNow(true);
     }).catch(function () { toast('The item could not be deleted. Please try again.'); });
   }
 
-  /* ---------- Lists and item view ---------- */
-  function refreshLists() {
-    function fill(id, values) {
-      var seen = {}, html = '';
-      values.forEach(function (v) {
-        v = String(v || '').trim();
-        var k = v.toLowerCase();
-        if (v && !seen[k]) { seen[k] = 1; html += '<option value="' + esc(v) + '">'; }
-      });
-      $(id).innerHTML = html;
-    }
-    var sheetVals = function (key) {
-      if (!state.sheet || state.sheet.map[key] < 0) return [];
-      var out = [], seen = {}, col = state.sheet.map[key];
-      for (var i = 0; i < state.sheet.rows.length && out.length < 200; i++) {
-        var v = state.sheet.rows[i][col];
-        if (v && !seen[v]) { seen[v] = 1; out.push(v); }
-      }
-      return out;
-    };
-    var pick = function (k) { return state.items.map(function (it) { return it[k]; }); };
-    fill('dl-cat', pick('category').concat(sheetVals('category')));
-    fill('dl-site', pick('site').concat(sheetVals('location')));
-    fill('dl-area', pick('area'));
-    fill('dl-unit', pick('unit').concat(sheetVals('unit')));
-
-    var sel = $('item-site'), cur = sel.value, seen = {}, html = '<option value="">All locations</option>';
-    pick('site').forEach(function (v) {
-      if (v && !seen[v.toLowerCase()]) { seen[v.toLowerCase()] = 1; html += '<option>' + esc(v) + '</option>'; }
-    });
-    sel.innerHTML = html; sel.value = cur;
-    if (sel.value !== cur) sel.value = '';
-  }
-
-  function filteredItems() {
-    var q = $('item-search').value.trim().toLowerCase(), site = $('item-site').value;
-    return state.items.filter(function (it) {
-      if (site && it.site !== site) return false;
-      if (!q) return true;
-      return [it.name, it.sku, it.description, it.category, it.site, it.area, it.bin, it.sheetId].join(' ').toLowerCase().indexOf(q) >= 0;
-    });
-  }
-
-  function renderItems() {
-    var list = filteredItems(), html = '';
-    $('item-count').textContent = state.items.length === 0
-      ? 'No items recorded yet. Go to "Scan & Add" to record your first item.'
-      : 'Showing ' + Math.min(list.length, state.shown) + ' of ' + list.length + (list.length === 1 ? ' item' : ' items') +
-        (list.length !== state.items.length ? ' (' + state.items.length + ' in total)' : '') + '.';
-    list.slice(0, state.shown).forEach(function (it) {
-      html += '<div class="item">' +
-        (it.thumb ? '<img src="' + esc(it.thumb) + '" alt="">' : '<div class="noimg"></div>') +
-        '<div class="body"><div class="name">' + esc(it.name) +
-        (state.settings.url ? '<span class="tag' + (it.synced ? '">Sent' : ' wait">Not sent yet') + '</span>' : '') + '</div>' +
-        '<div class="sku">' + esc(it.sku) + '</div>' +
-        '<div class="meta">' + esc(L.locationText(it)) + ' · Qty ' + esc(it.qty) + (it.unit ? ' ' + esc(it.unit) : '') +
-        ' · ' + esc(it.condition) + '</div>' +
-        '<div class="acts">' +
-        '<button type="button" class="small alt" data-act="edit" data-id="' + esc(it.id) + '">Edit</button>' +
-        '<button type="button" class="small alt" data-act="label" data-id="' + esc(it.id) + '">Print label</button>' +
-        '<button type="button" class="small danger" data-act="del" data-id="' + esc(it.id) + '">Delete</button>' +
-        '</div></div></div>';
-    });
-    $('item-list').innerHTML = html;
-    $('more-btn').classList.toggle('hidden', list.length <= state.shown);
-  }
-
-  function exportCSV() {
-    var list = filteredItems();
-    if (!list.length) return toast('There are no items to download yet.');
-    var blob = new Blob(['﻿' + L.toCSV(L.exportRows(list))], { type: 'text/csv;charset=utf-8' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'inventory-audit-' + nowText().slice(0, 10) + '.csv';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
-    toast('Downloaded ' + list.length + (list.length === 1 ? ' item.' : ' items.'));
-  }
-
-  /* ---------- Labels ---------- */
-  function printLabels(list) {
-    if (!list.length) return toast('There are no labels to print.');
-    if (list.length > 300) { list = list.slice(0, 300); toast('Printing the first 300 labels. Use the filters to print the rest.'); }
-    var area = $('print-area');
-    area.innerHTML = list.map(function (it, i) {
-      return '<div class="label"><div class="l-name">' + esc(it.name) + '</div>' +
-        '<svg id="bc-' + i + '"></svg>' +
-        '<div class="l-sku">' + esc(it.sku) + '</div>' +
-        '<div class="l-loc">' + esc(L.locationText(it)) + '</div></div>';
-    }).join('');
-    loadLib('barcode').then(function () {
-      list.forEach(function (it, i) {
-        try { window.JsBarcode('#bc-' + i, it.sku, { format: 'CODE128', displayValue: false, height: 40, margin: 0, width: 1.4 }); }
-        catch (e) { var s = $('bc-' + i); if (s) s.remove(); }
-      });
-    }).catch(function () {
-      Array.prototype.forEach.call(area.querySelectorAll('svg'), function (s) { s.remove(); });
-      toast('No internet, so the labels print without a barcode.');
-    }).then(function () { window.print(); });
-  }
-
-  /* ---------- Photo scan ---------- */
+  /* ---------- Photos and scanning ---------- */
   var ocrWorker = null;
   function loadImage(file) {
     return new Promise(function (res, rej) {
@@ -884,152 +1033,198 @@ if (typeof module !== 'undefined') module.exports = Logic;
     return loadLib('ocr').then(function () {
       if (ocrWorker) return ocrWorker;
       return window.Tesseract.createWorker('eng', 1, {
-        logger: function (m) {
-          if (m && m.status === 'recognizing text') { bar.value = Math.round((m.progress || 0) * 100); }
-        }
+        logger: function (m) { if (m && m.status === 'recognizing text') bar.value = Math.round((m.progress || 0) * 100); }
       }).then(function (w) { ocrWorker = w; return w; });
     }).then(function (w) { return w.recognize(canvas); })
       .then(function (r) { return (r && r.data && r.data.text) || ''; });
   }
 
-  function onPhoto() {
-    var file = $('photo-input').files[0];
-    if (!file) return;
+  function onPhotos(input) {
+    var files = Array.prototype.slice.call(input.files || []);
+    input.value = '';
+    if (!files.length) return;
+    var room = MAX_PHOTOS - state.form.photos.length - state.form.photoLinks.length;
+    if (room <= 0) { toast('You can add up to 4 photos. Remove one first.'); return; }
+    if (files.length > room) toast('Only ' + room + ' more photo' + (room === 1 ? '' : 's') + ' can be added.');
+    files = files.slice(0, room);
+    var bad = files.filter(function (f) { return !/^image\//.test(f.type); });
+    if (bad.length) { show($('scan-status'), 'That file is not a photo. Please choose a JPG or PNG picture.', 'err'); return; }
+    var shouldScan = state.form.sheetRow == null && !state.form.editingId;
+    var firstCanvas = null;
+    files.reduce(function (p, f) {
+      return p.then(function () {
+        return loadImage(f).then(function (img) {
+          var c = drawScaled(img, 1280);
+          if (!firstCanvas) firstCanvas = c;
+          state.form.photos.push({ full: c.toDataURL('image/jpeg', 0.72), thumb: drawScaled(img, 200).toDataURL('image/jpeg', 0.6) });
+          renderShots();
+        });
+      });
+    }, Promise.resolve()).then(function () {
+      hide($('form-error'));
+      if (shouldScan && firstCanvas) return scan(firstCanvas);
+    }).catch(function (e) {
+      if (e && e.message === 'bad image') show($('scan-status'), 'That photo could not be opened. Please try another one.', 'err');
+      else show($('scan-status'), 'The photo could not be read. Try a closer, brighter photo, or search the tracker below.', 'err');
+    });
+  }
+
+  function scan(canvas) {
     var status = $('scan-status'), bar = $('scan-progress');
     $('scan-results').innerHTML = '';
-    if (!/^image\//.test(file.type)) { show(status, 'That file is not a photo. Please choose a JPG or PNG picture.', 'err'); return; }
     show(status, 'Reading the photo. This can take a few seconds…', 'info');
     bar.value = 0; bar.classList.remove('hidden');
-    var canvas;
-    loadImage(file).then(function (img) {
-      canvas = drawScaled(img, 1600);
-      state.thumb = drawScaled(img, 200).toDataURL('image/jpeg', 0.6);
-      $('preview').src = state.thumb.length > 10 ? drawScaled(img, 600).toDataURL('image/jpeg', 0.7) : '';
-      $('preview').classList.remove('hidden'); $('photo-clear').classList.remove('hidden');
-      return readBarcodes(canvas);
-    }).then(function (codes) {
+    return readBarcodes(canvas).then(function (codes) {
       if (codes.length && showScan(codes.join(' '), true)) return null;
-      return readText(canvas).then(function (text) { showScan(codes.join(' ') + ' ' + text, false); });
+      return readText(canvas).then(function (text) { showScan(codes.join(' ') + '\n' + text, false); });
     }).catch(function (e) {
-      if (e && e.message === 'bad image') show(status, 'That photo could not be opened. Please try another one.', 'err');
-      else if (e && e.message === 'offline') show(status, 'The photo reader needs internet the first time. Connect, then try again, or search the sheet below.', 'err');
-      else show(status, 'The photo could not be read. Try a closer, brighter photo, or search the sheet below.', 'err');
+      if (e && e.message === 'offline') show(status, 'The photo reader needs internet the first time. Connect and try again, or search the tracker below.', 'err');
+      else show(status, 'The photo could not be read. Try a closer, brighter photo, or search the tracker below.', 'err');
     }).then(function () { bar.classList.add('hidden'); });
   }
 
   /* Shows what was found. Returns true if something useful was found. */
   function showScan(text, barcodeOnly) {
-    var status = $('scan-status'), box = $('scan-results'), html = '';
-    var upper = text.toUpperCase();
-    var known = state.items.filter(function (it) { return it.sku.length >= 5 && upper.indexOf(it.sku.toUpperCase()) >= 0; });
+    var status = $('scan-status'), box = $('scan-results'), html = '', flatText = L.norm(text);
+    var known = state.items.filter(function (it) {
+      var s = L.norm(it.sku), t = L.norm(it.trackingNo);
+      return (s.length >= 5 && flatText.indexOf(s) >= 0) || (t.length >= 5 && flatText.indexOf(t) >= 0);
+    });
     known.slice(0, 3).forEach(function (it) {
-      html += '<button type="button" class="pick" data-open="' + esc(it.id) + '"><b>Already recorded: ' + esc(it.name) + '</b>' +
-        '<span>' + esc(it.sku) + ' · ' + esc(L.locationText(it)) + ' — tap to open</span></button>';
+      html += '<button type="button" class="pick" data-open="' + esc(it.id) + '"><b>Already saved: ' + esc(it.itemName) + '</b>' +
+        '<span>SKU ' + esc(it.sku) + ' — tap to open</span></button>';
     });
     var matches = state.sheet ? L.matchRows(state.index, text, 5) : [];
-    matches.forEach(function (m) { html += rowButton(m.row); });
+    var set = state.sheet ? auditedSet() : {};
+    matches.forEach(function (m) { html += rowButton(m.row, set); });
 
     if (!known.length && !matches.length) {
       if (barcodeOnly) return false;
       var lines = text.split(/\r?\n/).map(function (s) { return s.trim(); }).filter(function (s) { return s.replace(/[^A-Za-z0-9]/g, '').length >= 3; });
-      if (!lines.length) {
-        show(status, 'No text was found in the photo. Try a closer, brighter photo of the label.', 'err');
-      } else if (!state.sheet) {
-        show(status, 'No tracking sheet is loaded yet, so the app cannot look the item up. Load it on the "Sheet" tab. You can also use the text below as the item name.', 'info');
-      } else {
-        show(status, 'No match in the tracking sheet. Search the sheet below, or use the text from the photo as the item name.', 'info');
-      }
+      if (!lines.length) show(status, 'No text was found in the photo. Try a closer, brighter photo of the label, or search the tracker below.', 'err');
+      else if (!state.sheet) show(status, 'The tracker is not loaded yet, so the app cannot look the item up. Load it on the List tab. You can also use the text below.', 'info');
+      else show(status, 'No match in the tracker. Search the tracker below, or use the text from the photo as the name.', 'info');
       lines.slice(0, 4).forEach(function (ln) {
         html += '<button type="button" class="pick" data-name="' + esc(ln.slice(0, 120)) + '"><b>' + esc(ln.slice(0, 120)) + '</b><span>Use as item name</span></button>';
       });
       box.innerHTML = html;
       return false;
     }
-    show(status, matches.length ? 'Tap the item that matches the photo.' : 'This item is already recorded.', 'good');
+    show(status, matches.length ? 'Tap the item that matches the photo.' : 'This item is already saved.', 'good');
     box.innerHTML = html;
     return true;
   }
 
-  function rowButton(i) {
-    var f = L.rowToFields(state.sheet.rows[i], state.sheet.map);
-    var done = state.items.some(function (it) { return it.sheetRow === i; });
-    var title = f.name || state.sheet.rows[i].filter(Boolean).slice(0, 2).join(' · ') || ('Row ' + (i + 2));
-    var sub = [f.sheetId, f.category, f.site].filter(Boolean).join(' · ') || ('Sheet row ' + (i + 2));
-    return '<button type="button" class="pick" data-row="' + i + '"><b>' + esc(title) + (done ? '<span class="tag">Recorded</span>' : '') + '</b>' +
-      '<span>' + esc(sub) + '</span></button>';
+  function rowButton(i, set) {
+    var it = sheetItem(i), done = rowAudited(i, set);
+    var sub = [it.trackingNo, it.ebayItemNo ? 'eBay # ' + it.ebayItemNo : '', it.qty ? 'On eBay: ' + it.qty : '', it.price].filter(Boolean).join(' · ');
+    return '<button type="button" class="pick" data-row="' + i + '"><b>' + esc(it.title || 'Row ' + (i + 1)) +
+      (done ? '<span class="tag">Audited</span>' : '') + '</b><span>' + esc(sub) + '</span></button>';
   }
 
   function onSheetSearch() {
     var q = $('sheet-search').value, box = $('search-results');
     if (!q.trim()) { box.innerHTML = ''; return; }
-    if (!state.sheet) { box.innerHTML = '<div class="msg info">Load your tracking sheet on the "Sheet" tab first.</div>'; return; }
-    var hits = L.searchRows(state.index, q, 8);
-    box.innerHTML = hits.length ? hits.map(rowButton).join('') : '<div class="msg info">Nothing in the sheet matches that. Check the spelling or fill in the form by hand.</div>';
+    if (!state.sheet) { box.innerHTML = '<div class="msg info">Load the tracker on the List tab first.</div>'; return; }
+    var hits = L.searchRows(state.index, q, 8), set = auditedSet();
+    box.innerHTML = hits.length ? hits.map(function (i) { return rowButton(i, set); }).join('')
+      : '<div class="msg info">Nothing in the tracker matches that. Check the spelling, or fill in the form for a new item.</div>';
   }
 
-  /* ---------- Tracking sheet ---------- */
+  /* ---------- Tracker list ---------- */
+  function setSheet(raw, source) {
+    var shaped = L.shapeSheet(raw);
+    if (!shaped) throw new Error('empty');
+    state.sheet = { headers: shaped.headers, rows: shaped.rows, map: L.guessMapping(shaped.headers), fileName: source };
+    if (state.sheet.map.title < 0) throw new Error('notitle');
+    state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
+    state.listShown = 50;
+    return DB.setMeta('sheet', state.sheet);
+  }
+  function sheetError(e) {
+    var s = $('sheet-status');
+    if (e && e.message === 'empty') show(s, 'That sheet has no item rows under the header row. Please check it and try again.', 'err');
+    else if (e && e.message === 'notitle') show(s, 'The app could not find the Title column. Make sure the sheet has a "Title" header.', 'err');
+    else if (e && e.message === 'offline') show(s, 'Excel files need internet the first time. Connect and try again, or save the sheet as CSV.', 'err');
+    else show(s, 'That file could not be read. Try saving it as CSV and loading it again.', 'err');
+  }
+  function afterSheet() {
+    renderSheet(); refreshLists(); renderList();
+    toast('Tracker loaded.');
+  }
+
   function onSheetFile() {
     var file = $('sheet-input').files[0];
     if (!file) return;
-    var status = $('sheet-status'), name = file.name.toLowerCase();
-    show(status, 'Loading the sheet…', 'info');
-    var job;
+    var name = file.name.toLowerCase(), job;
+    show($('sheet-status'), 'Loading the tracker…', 'info');
     if (/\.(xlsx|xls)$/.test(name)) {
       job = loadLib('xlsx').then(function () { return file.arrayBuffer(); }).then(function (buf) {
         var wb = window.XLSX.read(buf, { type: 'array' });
-        return window.XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: false });
+        var sn = wb.SheetNames.indexOf('Listing Tracker') >= 0 ? 'Listing Tracker' : wb.SheetNames[0];
+        return window.XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, defval: '', raw: false });
       });
     } else if (/\.(csv|tsv|txt)$/.test(name)) {
       job = file.text().then(L.parseCSV);
     } else {
       $('sheet-input').value = '';
-      return show(status, 'Please choose a CSV or Excel file (.csv, .xlsx, or .xls).', 'err');
+      return show($('sheet-status'), 'Please choose a CSV or Excel file (.csv, .xlsx, or .xls).', 'err');
     }
-    job.then(function (raw) {
-      var shaped = L.shapeSheet(raw);
-      if (!shaped) throw new Error('empty');
-      state.sheet = { headers: shaped.headers, rows: shaped.rows, map: L.guessMapping(shaped.headers), fileName: file.name };
-      state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
-      return DB.setMeta('sheet', state.sheet);
-    }).then(function () {
-      renderSheet(); refreshLists();
-      toast('Tracking sheet loaded.');
-    }).catch(function (e) {
-      if (e && e.message === 'empty') show(status, 'That file has no rows under the header row. Please check the file and try again.', 'err');
-      else if (e && e.message === 'offline') show(status, 'Excel files need internet the first time. Connect and try again, or save the sheet as CSV.', 'err');
-      else show(status, 'That file could not be read. Try saving it as CSV and loading it again.', 'err');
-    }).then(function () { $('sheet-input').value = ''; });
+    job.then(function (raw) { return setSheet(raw, file.name); }).then(afterSheet).catch(sheetError)
+      .then(function () { $('sheet-input').value = ''; });
+  }
+
+  function onGoogleLoad() {
+    var url = state.settings.url, s = $('sheet-status');
+    if (!url) { show(s, 'Add your Google Sheet web app link in Settings first.', 'err'); return; }
+    if (navigator.onLine === false) { show(s, 'No internet right now. Connect and try again.', 'err'); return; }
+    show(s, 'Loading the tracker from Google Sheets…', 'info');
+    fetch(url + '?action=list').then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (d) {
+      if (!d || !d.ok) throw new Error(d && d.error ? 'script:' + d.error : 'script');
+      state.teamAudited = d.audited || [];
+      DB.setMeta('teamAudited', state.teamAudited).catch(function () {});
+      return setSheet(d.rows, 'Google Sheet (' + nowText() + ')');
+    }).then(afterSheet).catch(function (e) {
+      var m = e && e.message || '';
+      if (m.indexOf('script:No tab') === 0) show(s, 'The Google Sheet has no tab named "Listing Tracker". Rename the list tab and try again.', 'err');
+      else if (m === 'empty' || m === 'notitle') sheetError(e);
+      else show(s, 'The tracker could not be loaded. Check the link in Settings and that the new script is deployed with access set to "Anyone".', 'err');
+    });
   }
 
   function renderSheetStatus() {
     if (!state.sheet) return;
-    var done = {};
-    state.items.forEach(function (it) { if (it.sheetRow != null) done[it.sheetRow] = 1; });
-    show($('sheet-status'), state.sheet.rows.length + ' rows loaded from "' + state.sheet.fileName + '". ' +
-      Object.keys(done).length + ' of them recorded on this device so far.', 'info');
+    var set = auditedSet(), done = 0;
+    for (var i = 0; i < state.sheet.rows.length; i++) if (rowAudited(i, set)) done++;
+    show($('sheet-status'), state.sheet.rows.length + ' items loaded from ' + state.sheet.fileName + '. ' + done + ' audited so far.', 'info');
   }
 
   function renderSheet() {
     var has = !!state.sheet;
-    $('map-card').classList.toggle('hidden', !has);
-    $('sheet-remove').classList.toggle('hidden', !has);
+    $('map-box').classList.toggle('hidden', !has);
+    $('list-card').classList.toggle('hidden', !has);
     if (!has) { hide($('sheet-status')); return; }
     renderSheetStatus();
     var opts = '<option value="-1">(not in my sheet)</option>' + state.sheet.headers.map(function (h, i) {
       return '<option value="' + i + '">' + esc(h) + '</option>';
     }).join('');
-    $('map-grid').innerHTML = L.FIELDS.slice().sort(function (a, b) {
-      var order = ['id', 'name', 'desc', 'category', 'location', 'qty', 'unit'];
-      return order.indexOf(a.key) - order.indexOf(b.key);
-    }).map(function (f) {
-      return '<div><label for="map-' + f.key + '">' + esc(f.label) + '</label><select id="map-' + f.key + '" data-map="' + f.key + '">' + opts + '</select></div>';
+    $('map-grid').innerHTML = L.SHEET_FIELDS.map(function (f) {
+      return '<div><label class="f" for="map-' + f.key + '">' + esc(f.label) + '</label><select id="map-' + f.key + '" data-map="' + f.key + '">' + opts + '</select></div>';
     }).join('');
-    L.FIELDS.forEach(function (f) { $('map-' + f.key).value = String(state.sheet.map[f.key]); });
-    var head = '<tr>' + state.sheet.headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr>';
-    var body = state.sheet.rows.slice(0, 5).map(function (r) {
-      return '<tr>' + r.map(function (v) { return '<td>' + esc(v) + '</td>'; }).join('') + '</tr>';
-    }).join('');
-    $('sheet-preview').innerHTML = head + body;
+    L.SHEET_FIELDS.forEach(function (f) { $('map-' + f.key).value = String(state.sheet.map[f.key] == null ? -1 : state.sheet.map[f.key]); });
+  }
+
+  function renderList() {
+    if (!state.sheet) return;
+    var set = auditedSet(), mode = $('list-filter').value;
+    var hits = L.searchRows(state.index, $('list-search').value, 0, function (i) {
+      if (mode === 'all') return true;
+      var d = rowAudited(i, set);
+      return mode === 'done' ? d : !d;
+    });
+    $('list-count').textContent = hits.length + (hits.length === 1 ? ' item' : ' items') + (mode === 'todo' ? ' still to audit.' : '.');
+    $('list-rows').innerHTML = hits.slice(0, state.listShown).map(function (i) { return rowButton(i, set); }).join('');
+    $('list-more').classList.toggle('hidden', hits.length <= state.listShown);
   }
 
   function onMapChange(ev) {
@@ -1038,30 +1233,127 @@ if (typeof module !== 'undefined') module.exports = Logic;
     state.sheet.map[key] = parseInt(ev.target.value, 10);
     state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
     DB.setMeta('sheet', state.sheet).catch(function () {});
-    refreshLists();
+    refreshLists(); renderList(); renderSheetStatus();
     toast('Column saved.');
   }
 
-  function removeSheet() {
-    if (!window.confirm('Remove the tracking sheet from this device? Your recorded items stay.')) return;
-    state.sheet = null; state.index = [];
-    DB.setMeta('sheet', null).catch(function () {});
-    renderSheet(); refreshLists();
-    $('search-results').innerHTML = '';
-    toast('Tracking sheet removed.');
+  /* ---------- Saved audits ---------- */
+  function refreshLists() {
+    function fill(id, values) {
+      var seen = {}, html = '';
+      values.forEach(function (v) {
+        v = String(v || '').trim();
+        var k = v.toLowerCase();
+        if (v && !seen[k]) { seen[k] = 1; html += '<option value="' + esc(v) + '">'; }
+      });
+      $(id).innerHTML = html;
+    }
+    var sheetVals = function (key) {
+      if (!state.sheet || !(state.sheet.map[key] >= 0)) return [];
+      return state.sheet.rows.map(function (r) { return r[state.sheet.map[key]]; });
+    };
+    fill('dl-category', state.items.map(function (it) { return it.category; }).concat(sheetVals('category')));
+    fill('dl-shelf', state.items.map(function (it) { return it.shelf; }).concat(sheetVals('shelf')));
+  }
+
+  function filteredItems() {
+    var q = $('item-search').value.trim().toLowerCase(), f = $('item-filter').value;
+    return state.items.filter(function (it) {
+      if (f === 'found' && it.found !== 'Yes') return false;
+      if (f === 'notfound' && it.found !== 'No') return false;
+      if (f === 'diff' && !L.qtyDiffers(it)) return false;
+      if (!q) return true;
+      return [it.itemName, it.sku, it.trackingNo, it.ebayItemNo, it.category, it.shelf, it.description, it.auditedBy].join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  function renderItems() {
+    var list = filteredItems(), html = '';
+    $('item-count').textContent = state.items.length === 0
+      ? 'Nothing saved yet. Go to the Audit tab to record your first item.'
+      : 'Showing ' + Math.min(list.length, state.recShown) + ' of ' + list.length + (list.length === 1 ? ' item' : ' items') +
+        (list.length !== state.items.length ? ' (' + state.items.length + ' in total)' : '') + '.';
+    list.slice(0, state.recShown).forEach(function (it) {
+      var tags = it.found === 'No' ? '<span class="tag bad">Not found</span>' : '<span class="tag">Found</span>';
+      if (L.qtyDiffers(it)) tags += '<span class="tag wait">eBay says ' + esc(it.ebayQty) + '</span>';
+      if (state.settings.url) tags += it.synced ? '<span class="tag grey">Sent</span>' : '<span class="tag wait">Not sent yet</span>';
+      var meta1 = ['SKU ' + it.sku, it.trackingNo].filter(Boolean).join(' · ');
+      var meta2 = [it.found === 'Yes' ? 'Qty ' + it.quantity : '', it.condition, it.shelf ? 'Shelf ' + it.shelf : '', 'By ' + it.auditedBy].filter(Boolean).join(' · ');
+      var nPhotos = (it.photos || []).length + (it.photoLinks || []).length;
+      html += '<div class="item">' +
+        (it.thumb ? '<img src="' + esc(it.thumb) + '" alt="">' : '<div class="noimg"></div>') +
+        '<div class="body"><div class="name">' + esc(it.itemName) + tags + '</div>' +
+        '<div class="meta">' + esc(meta1) + '</div><div class="meta">' + esc(meta2) + '</div>' +
+        '<div class="acts">' +
+        '<button type="button" class="small alt" data-act="edit" data-id="' + esc(it.id) + '">Open</button>' +
+        '<button type="button" class="small alt" data-act="label" data-id="' + esc(it.id) + '">Print label</button>' +
+        (nPhotos ? '<button type="button" class="small alt" data-act="photos" data-id="' + esc(it.id) + '">Photos (' + nPhotos + ')</button>' : '') +
+        '<button type="button" class="small danger" data-act="del" data-id="' + esc(it.id) + '">Delete</button>' +
+        '</div></div></div>';
+    });
+    $('item-list').innerHTML = html;
+    $('more-btn').classList.toggle('hidden', list.length <= state.recShown);
+  }
+
+  function downloadPhotos(it) {
+    var local = it.photos || [];
+    if (local.length) {
+      local.forEach(function (p, i) {
+        setTimeout(function () {
+          var a = document.createElement('a');
+          a.href = p.full; a.download = it.sku + '-' + (i + 1) + '.jpg';
+          document.body.appendChild(a); a.click(); a.remove();
+        }, i * 400);
+      });
+      toast('Downloading ' + local.length + (local.length === 1 ? ' photo.' : ' photos.'));
+    }
+    if (!local.length && (it.photoLinks || []).length) {
+      window.open(it.photoLinks[0], '_blank', 'noopener');
+      toast('Photos are in the Google Drive folder "Inventory Audit Photos".');
+    }
+  }
+
+  function exportCSV() {
+    var list = filteredItems();
+    if (!list.length) return toast('There is nothing to download yet.');
+    var blob = new Blob(['﻿' + L.toCSV(L.exportRows(list))], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'inventory-audit-' + nowText().slice(0, 10) + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    toast('Downloaded ' + list.length + (list.length === 1 ? ' item.' : ' items.'));
+  }
+
+  function printLabels(list) {
+    list = list.filter(function (it) { return it.found === 'Yes'; });
+    if (!list.length) return toast('There are no found items to label.');
+    if (list.length > 300) { list = list.slice(0, 300); toast('Printing the first 300 labels. Use search to print the rest.'); }
+    var area = $('print-area');
+    area.innerHTML = list.map(function (it, i) {
+      return '<div class="label"><div class="l-name">' + esc(it.itemName) + '</div><svg id="bc-' + i + '"></svg>' +
+        '<div class="l-code">' + esc(it.sku) + '</div>' +
+        '<div class="l-loc">' + esc([it.trackingNo, it.shelf ? 'Shelf/Bin: ' + it.shelf : ''].filter(Boolean).join(' · ')) + '</div></div>';
+    }).join('');
+    loadLib('barcode').then(function () {
+      list.forEach(function (it, i) {
+        try { window.JsBarcode('#bc-' + i, it.sku, { format: 'CODE128', displayValue: false, height: 40, margin: 0, width: 1.4 }); }
+        catch (e) { var s = $('bc-' + i); if (s) s.remove(); }
+      });
+    }).catch(function () {
+      Array.prototype.forEach.call(area.querySelectorAll('svg'), function (s) { s.remove(); });
+      toast('No internet, so the labels print without a barcode.');
+    }).then(function () { window.print(); });
   }
 
   /* ---------- Settings and sync ---------- */
-  function saveDetails() {
-    var name = $('s-name').value.trim(), dev = $('s-device').value.trim().toUpperCase(), box = $('settings-msg');
+  function saveDevice() {
+    var dev = $('s-device').value.trim().toUpperCase(), box = $('settings-msg');
     if (!/^[A-Z0-9]{2}$/.test(dev)) { show(box, 'The device code must be 2 letters or numbers, like K7.', 'err'); $('s-device').focus(); return; }
     hide(box);
-    state.settings.name = name; state.settings.device = dev;
-    $('s-device').value = dev;
+    state.settings.device = dev; $('s-device').value = dev;
     DB.setMeta('settings', state.settings).catch(function () {});
-    if (!val('by')) setVal('by', name);
-    refreshSku();
-    toast('Details saved.');
+    toast('Device code saved.');
   }
 
   function saveUrl() {
@@ -1073,8 +1365,8 @@ if (typeof module !== 'undefined') module.exports = Logic;
     state.settings.url = url;
     DB.setMeta('settings', state.settings).catch(function () {});
     updateChip();
-    if (!url) { show(box, 'Link removed. Records now stay on this device only.', 'info'); return; }
-    show(box, 'Link saved. Sending records…', 'info');
+    if (!url) { show(box, 'Link removed. Audits now stay on this device only.', 'info'); return; }
+    show(box, 'Link saved. Sending audits…', 'info');
     syncNow(false);
   }
 
@@ -1086,34 +1378,53 @@ if (typeof module !== 'undefined') module.exports = Logic;
     chip.textContent = state.syncing ? 'Sending…' : (waiting ? waiting + ' not sent yet' : 'All sent to Google Sheet');
   }
 
+  function post(body) {
+    return fetch(state.settings.url, { method: 'POST', body: JSON.stringify(body) })
+      .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
+      .then(function (d) { if (!d || !d.ok) throw new Error('script'); return d; });
+  }
+
   function syncNow(quiet) {
     var box = $('sync-msg');
-    if (!state.settings.url) { if (!quiet) show(box, 'Add the web app link first, then tap "Save link".', 'err'); return; }
-    if (state.syncing) return;
-    var todo = state.items.filter(function (it) { return !it.synced; }), dels = state.pendingDeletes.slice();
-    if (!todo.length && !dels.length) { if (!quiet) show(box, 'Everything is already sent.', 'good'); updateChip(); return; }
-    if (navigator.onLine === false) { if (!quiet) show(box, 'No internet right now. Records are safe on this device and will send later.', 'info'); updateChip(); return; }
+    if (!state.settings.url) { if (!quiet) show(box, 'Add the web app link first, then tap "Save link".', 'err'); return Promise.resolve(); }
+    if (state.syncing) return Promise.resolve();
+    var todo = state.items.filter(function (it) { return !it.synced && it.id !== state.form.editingId; });
+    var dels = state.pendingDeletes.slice(), sent = 0;
+    if (!todo.length && !dels.length) { if (!quiet) show(box, 'Everything is already sent.', 'good'); updateChip(); return Promise.resolve(); }
+    if (navigator.onLine === false) { if (!quiet) show(box, 'No internet right now. Audits are safe on this device and will send later.', 'info'); updateChip(); return Promise.resolve(); }
     state.syncing = true; updateChip();
-    fetch(state.settings.url, { method: 'POST', body: JSON.stringify({ records: todo.map(L.plainRecord), deleted: dels }) })
-      .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
-      .then(function (data) {
-        if (!data || !data.ok) throw new Error('script');
-        todo.forEach(function (it) { it.synced = true; });
+    var chain = todo.reduce(function (p, it) {
+      return p.then(function () {
+        var photos = it.photosSent ? [] : (it.photos || []).map(function (ph) { return ph.full.split(',')[1]; });
+        return post({ headers: L.EXPORT_HEAD, record: L.recordObject(it), photos: photos }).then(function (d) {
+          it.synced = true;
+          if (photos.length) { it.photosSent = true; it.photoLinks = d.photoLinks || it.photoLinks; it.photos = []; }
+          sent++; updateChip();
+          return DB.putItem(it);
+        });
+      });
+    }, Promise.resolve());
+    return chain.then(function () {
+      if (!dels.length) return null;
+      return post({ headers: L.EXPORT_HEAD, deleted: dels }).then(function () {
         state.pendingDeletes = state.pendingDeletes.filter(function (s) { return dels.indexOf(s) < 0; });
-        return DB.putItems(todo).then(function () { return DB.setMeta('pendingDeletes', state.pendingDeletes); });
-      })
-      .then(function () { if (!quiet) show(box, 'Sent ' + todo.length + (todo.length === 1 ? ' record' : ' records') + ' to the Google Sheet.', 'good'); })
-      .catch(function () {
-        if (!quiet) show(box, 'The records could not be sent. Check the link and that the script is deployed with access set to "Anyone". Records are still safe on this device.', 'err');
-      })
-      .then(function () { state.syncing = false; updateChip(); if (!$('tab-items').classList.contains('hidden')) renderItems(); });
+        return DB.setMeta('pendingDeletes', state.pendingDeletes);
+      });
+    }).then(function () {
+      if (!quiet) show(box, 'Sent ' + sent + (sent === 1 ? ' audit' : ' audits') + ' to the Google Sheet.', 'good');
+    }).catch(function () {
+      if (!quiet) show(box, 'Some audits could not be sent. Check the link and that the new script is deployed with access set to "Anyone". Everything is still safe on this device.', 'err');
+    }).then(function () {
+      state.syncing = false; updateChip();
+      if (!$('tab-items').classList.contains('hidden')) renderItems();
+    });
   }
 
   function wipeAll() {
-    if (!window.confirm('Delete ALL records and the tracking sheet from this device? This cannot be undone.')) return;
+    if (!window.confirm('Delete ALL saved audits, photos, and the tracker from this device? This cannot be undone.')) return;
     DB.wipe().catch(function () {}).then(function () {
       var keep = state.settings;
-      state.items = []; state.sheet = null; state.index = []; state.pendingDeletes = [];
+      state.items = []; state.sheet = null; state.index = []; state.pendingDeletes = []; state.teamAudited = [];
       DB.setMeta('settings', keep).catch(function () {});
       clearForm(); hide($('saved-box')); renderSheet(); refreshLists(); renderItems(); updateChip();
       toast('Everything on this device was deleted.');
@@ -1125,56 +1436,78 @@ if (typeof module !== 'undefined') module.exports = Logic;
     Array.prototype.forEach.call(document.querySelectorAll('nav button'), function (b) {
       b.addEventListener('click', function () { openTab(b.getAttribute('data-tab')); });
     });
-    $('photo-btn').addEventListener('click', function () { $('photo-input').click(); });
-    $('photo-input').addEventListener('change', onPhoto);
-    $('photo-clear').addEventListener('click', clearPhoto);
+    $('cam-btn').addEventListener('click', function () { $('cam-input').click(); });
+    $('gal-btn').addEventListener('click', function () { $('gal-input').click(); });
+    $('cam-input').addEventListener('change', function () { onPhotos($('cam-input')); });
+    $('gal-input').addEventListener('change', function () { onPhotos($('gal-input')); });
+    $('shots').addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('button') : null;
+      if (!b) return;
+      if (b.hasAttribute('data-rmphoto')) state.form.photos.splice(parseInt(b.getAttribute('data-rmphoto'), 10), 1);
+      if (b.hasAttribute('data-rmlink')) state.form.photoLinks.splice(parseInt(b.getAttribute('data-rmlink'), 10), 1);
+      renderShots();
+    });
     $('sheet-search').addEventListener('input', onSheetSearch);
     function pickHandler(ev) {
       var b = ev.target.closest ? ev.target.closest('.pick') : null;
       if (!b) return;
-      if (b.hasAttribute('data-row')) fillFromRow(parseInt(b.getAttribute('data-row'), 10));
+      if (b.hasAttribute('data-row')) { fillFromRow(parseInt(b.getAttribute('data-row'), 10)); openTabKeep(); }
       else if (b.hasAttribute('data-open')) editItem(b.getAttribute('data-open'));
-      else if (b.hasAttribute('data-name')) { setVal('name', b.getAttribute('data-name')); $('scan-results').innerHTML = ''; $('f-name').focus(); }
+      else if (b.hasAttribute('data-name')) {
+        setVal('itemName', b.getAttribute('data-name')); b.remove();
+        if (!getVal('sku')) setVal('sku', L.makeNewSku(state.settings.device, others(null).map(function (x) { return x.sku; })));
+        $('f-itemName').focus();
+      }
     }
+    function openTabKeep() { if ($('tab-add').classList.contains('hidden')) { openTab('add'); $('item-form').scrollIntoView(); } }
     $('scan-results').addEventListener('click', pickHandler);
     $('search-results').addEventListener('click', pickHandler);
+    $('list-rows').addEventListener('click', pickHandler);
 
+    $('found-seg').addEventListener('click', function (ev) {
+      var v = ev.target.getAttribute('data-found');
+      if (v) { setFound(v); hide($('form-error')); }
+    });
     $('item-form').addEventListener('submit', saveItem);
     $('clear-btn').addEventListener('click', function () { clearForm(); hide($('saved-box')); });
-    $('newsku-btn').addEventListener('click', function () {
-      setVal('sku', L.makeSku(val('cat'), val('site'), state.settings.device, allSkus(state.editingId)));
-      state.skuTouched = false; hide($('form-error'));
+    $('sku-btn').addEventListener('click', function () {
+      var info = state.form.info, used = others(state.form.editingId).map(function (x) { return x.sku; });
+      var next = info ? L.suggestSku({ sku: '', ebayItemNo: info.ebayItemNo }) : '';
+      if (!next || next === getVal('sku').toUpperCase()) next = L.makeNewSku(state.settings.device, used);
+      if (getVal('sku') && !window.confirm('Replace SKU ' + getVal('sku') + ' with ' + next + '?')) return;
+      setVal('sku', next); hide($('form-error'));
     });
-    $('f-sku').addEventListener('input', function () { state.skuTouched = $('f-sku').value.trim() !== ''; });
-    $('f-cat').addEventListener('input', refreshSku);
-    $('f-site').addEventListener('input', refreshSku);
     $('saved-box').addEventListener('click', function (ev) {
       if (ev.target.id === 'print-last') { var it = findItem(state.lastSavedId); if (it) printLabels([it]); }
     });
 
-    $('item-search').addEventListener('input', function () { state.shown = 100; renderItems(); });
-    $('item-site').addEventListener('change', function () { state.shown = 100; renderItems(); });
-    $('more-btn').addEventListener('click', function () { state.shown += 100; renderItems(); });
+    $('sheet-btn').addEventListener('click', function () { $('sheet-input').click(); });
+    $('sheet-input').addEventListener('change', onSheetFile);
+    $('gsheet-btn').addEventListener('click', onGoogleLoad);
+    $('map-grid').addEventListener('change', onMapChange);
+    $('list-search').addEventListener('input', function () { state.listShown = 50; renderList(); });
+    $('list-filter').addEventListener('change', function () { state.listShown = 50; renderList(); });
+    $('list-more').addEventListener('click', function () { state.listShown += 50; renderList(); });
+
+    $('item-search').addEventListener('input', function () { state.recShown = 100; renderItems(); });
+    $('item-filter').addEventListener('change', function () { state.recShown = 100; renderItems(); });
+    $('more-btn').addEventListener('click', function () { state.recShown += 100; renderItems(); });
     $('export-btn').addEventListener('click', exportCSV);
     $('print-all-btn').addEventListener('click', function () { printLabels(filteredItems()); });
     $('item-list').addEventListener('click', function (ev) {
-      var act = ev.target.getAttribute('data-act'), id = ev.target.getAttribute('data-id');
+      var act = ev.target.getAttribute('data-act'), id = ev.target.getAttribute('data-id'), it = findItem(id);
+      if (!act || !it) return;
       if (act === 'edit') editItem(id);
       else if (act === 'del') deleteItem(id);
-      else if (act === 'label') { var it = findItem(id); if (it) printLabels([it]); }
+      else if (act === 'label') printLabels([it]);
+      else if (act === 'photos') downloadPhotos(it);
     });
 
-    $('sheet-btn').addEventListener('click', function () { $('sheet-input').click(); });
-    $('sheet-input').addEventListener('change', onSheetFile);
-    $('sheet-remove').addEventListener('click', removeSheet);
-    $('map-grid').addEventListener('change', onMapChange);
-
-    $('s-save').addEventListener('click', saveDetails);
+    $('s-save').addEventListener('click', saveDevice);
     $('s-url-save').addEventListener('click', saveUrl);
     $('sync-now').addEventListener('click', function () { syncNow(false); });
     $('copy-script').addEventListener('click', function () {
-      var box = $('script-box');
-      var done = function () { toast('Script copied.'); };
+      var box = $('script-box'), done = function () { toast('Script copied.'); };
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(box.value).then(done).catch(function () { box.select(); toast('Select the script and copy it by hand.'); });
       } else { box.select(); try { document.execCommand('copy'); done(); } catch (e) { toast('Select the script and copy it by hand.'); } }
@@ -1185,25 +1518,40 @@ if (typeof module !== 'undefined') module.exports = Logic;
 
   function start() {
     wire();
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(function () {});
     DB.open().then(function () {
-      return Promise.all([DB.allItems(), DB.getMeta('sheet'), DB.getMeta('settings'), DB.getMeta('pendingDeletes')]);
+      return Promise.all([DB.allItems(), DB.getMeta('sheet'), DB.getMeta('settings'), DB.getMeta('pendingDeletes'), DB.getMeta('teamAudited')]);
     }).then(function (got) {
-      state.items = (got[0] || []).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
+      var changed = [];
+      state.items = (got[0] || []).map(function (it) {
+        var m = L.migrate(it);
+        if (m !== it) changed.push(m);
+        return m;
+      }).sort(function (a, b) { return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
       state.sheet = got[1] || null;
-      if (got[2]) state.settings = { name: got[2].name || '', device: got[2].device || '', url: got[2].url || '' };
+      if (state.sheet && (!state.sheet.map || state.sheet.map.sku === undefined)) {
+        state.sheet.map = L.guessMapping(state.sheet.headers);
+        DB.setMeta('sheet', state.sheet).catch(function () {});
+      }
+      if (got[2]) state.settings = { device: got[2].device || '', url: got[2].url || '', lastAuditor: L.AUDITORS.indexOf(got[2].lastAuditor) >= 0 ? got[2].lastAuditor : '' };
       state.pendingDeletes = got[3] || [];
+      state.teamAudited = got[4] || [];
+      if (changed.length) return DB.putItems(changed);
     }).catch(function () {
       state.memoryOnly = true;
-      show($('form-error'), 'This browser is blocking storage, so records will be lost when you close the page. Turn off private browsing, then reload.', 'err');
+      show($('form-error'), 'This browser is blocking storage, so audits will be lost when you close the page. Turn off private browsing, then reload.', 'err');
     }).then(function () {
       if (!state.settings.device) {
         state.settings.device = randomDevice();
         DB.setMeta('settings', state.settings).catch(function () {});
       }
       if (state.sheet) state.index = L.buildIndex(state.sheet.rows, state.sheet.map);
-      $('s-name').value = state.settings.name; $('s-device').value = state.settings.device; $('s-url').value = state.settings.url;
-      setVal('by', state.settings.name);
-      renderSheet(); refreshLists(); refreshSku(); updateChip();
+      $('s-device').value = state.settings.device; $('s-url').value = state.settings.url;
+      var err = $('form-error').classList.contains('hidden') ? null : $('form-error').textContent;
+      clearForm();
+      if (err) show($('form-error'), err, 'err');
+      renderSheet(); refreshLists(); updateChip();
+      if (!state.sheet) show($('scan-status'), 'First time here? Load the tracker on the List tab so the app can find items.', 'info');
       syncNow(true);
       window.__appReady = true;
     });
